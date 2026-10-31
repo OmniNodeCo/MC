@@ -1,0 +1,11 @@
+name: probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [arena/da57a0d8-mc]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "actions work" && rustc --version && cargo --version
