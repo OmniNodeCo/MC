@@ -1,0 +1,180 @@
+   Compiling cfg-if v1.0.5
+   Compiling bitflags v2.13.2
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling libloading v0.8.9
+   Compiling once_cell v1.21.4
+   Compiling log v0.4.35
+   Compiling pkg-config v0.3.34
+   Compiling smallvec v1.16.4
+   Compiling libc v0.2.191
+   Compiling rustix v1.1.6
+   Compiling linux-raw-sys v0.12.1
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.15
+   Compiling wayland-sys v0.31.11
+   Compiling cc v1.10.0
+   Compiling dlib v0.5.3
+   Compiling cfg_aliases v0.1.1
+   Compiling syn v2.0.119
+   Compiling thiserror v1.0.69
+   Compiling scoped-tls v1.0.1
+   Compiling memchr v2.8.3
+   Compiling wayland-backend v0.3.17
+   Compiling downcast-rs v1.2.1
+   Compiling wayland-client v0.31.15
+   Compiling quick-xml v0.41.0
+   Compiling syn v3.0.9
+   Compiling thiserror-impl v1.0.69
+   Compiling wayland-scanner v0.31.11
+   Compiling arrayvec v0.7.8
+   Compiling autocfg v1.5.1
+   Compiling num-traits v0.2.19
+   Compiling rustix v0.38.44
+   Compiling parking_lot_core v0.9.12
+   Compiling khronos-egl v6.0.0
+   Compiling termcolor v1.4.1
+   Compiling bytemuck_derive v1.12.1
+   Compiling foldhash v0.1.5
+   Compiling scopeguard v1.2.0
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling linux-raw-sys v0.4.15
+   Compiling ash v0.37.3+1.3.251
+   Compiling unicode-width v0.1.14
+   Compiling bit-vec v0.6.3
+   Compiling bytemuck v1.25.2
+   Compiling codespan-reporting v0.11.1
+   Compiling bit-set v0.5.3
+   Compiling indexmap v2.14.2
+   Compiling polling v3.11.0
+   Compiling lock_api v0.4.14
+   Compiling hashbrown v0.15.5
+   Compiling wgpu-hal v0.21.1
+   Compiling gpu-descriptor-types v0.2.0
+   Compiling spirv v0.3.0+sdk-1.3.268.0
+   Compiling gpu-alloc-types v0.3.1
+   Compiling libloading v0.7.4
+   Compiling rustc-hash v1.1.0
+   Compiling slab v0.4.12
+   Compiling raw-window-handle v0.6.2
+   Compiling wayland-protocols v0.31.2
+   Compiling hexf-parse v0.2.1
+   Compiling unicode-xid v0.2.6
+   Compiling naga v0.20.0
+   Compiling calloop v0.12.4
+   Compiling gpu-alloc v0.6.2
+   Compiling gpu-descriptor v0.3.2
+   Compiling parking_lot v0.12.5
+   Compiling wgpu-core v0.21.1
+   Compiling wgpu-types v0.20.0
+   Compiling xkeysym v0.2.1
+   Compiling arrayref v0.3.9
+   Compiling zerocopy v0.8.63
+   Compiling renderdoc-sys v1.1.0
+   Compiling profiling v1.0.18
+   Compiling getrandom v0.3.4
+   Compiling strict-num v0.1.1
+   Compiling cursor-icon v1.2.0
+   Compiling version_check v0.9.5
+   Compiling glow v0.13.1
+   Compiling litrs v1.0.1
+   Compiling ttf-parser v0.25.1
+   Compiling xcursor v0.3.11
+   Compiling smithay-client-toolkit v0.18.1
+   Compiling wayland-cursor v0.31.14
+   Compiling document-features v0.2.12
+   Compiling ahash v0.8.12
+   Compiling owned_ttf_parser v0.25.1
+   Compiling wayland-csd-frame v0.3.0
+   Compiling tiny-skia-path v0.11.4
+   Compiling wayland-protocols-wlr v0.2.0
+   Compiling calloop-wayland-source v0.2.0
+   Compiling memmap2 v0.9.12
+   Compiling wgpu v0.20.1
+   Compiling x11-dl v2.21.0
+   Compiling ab_glyph_rasterizer v0.1.10
+   Compiling ab_glyph v0.2.32
+   Compiling tiny-skia v0.11.4
+   Compiling gethostname v1.1.0
+   Compiling winit v0.29.15
+   Compiling static_assertions v1.1.0
+   Compiling glam v0.27.0
+   Compiling x11rb-protocol v0.13.2
+   Compiling as-raw-xcb-connection v1.0.1
+   Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
+error[E0308]: mismatched types
+   --> crates/voxel/src/textures.rs:523:27
+    |
+523 |                 t.rect(x, y0, w.min(TILE_PX - 1 - x), 4, rgb(c));
+    |                   ----    ^^ expected `u32`, found `usize`
+    |                   |
+    |                   arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/voxel/src/textures.rs:162:8
+    |
+162 |     fn rect(&mut self, x: u32, y: u32, w: u32, h: u32, c: Rgba) {
+    |        ^^^^                    ------
+help: you can convert a `usize` to a `u32` and panic if the converted value doesn't fit
+    |
+523 |                 t.rect(x, y0.try_into().unwrap(), w.min(TILE_PX - 1 - x), 4, rgb(c));
+    |                             ++++++++++++++++++++
+
+error[E0689]: can't call method `abs` on ambiguous numeric type `{integer}`
+   --> crates/voxel/src/worldgen.rs:218:41
+    |
+216 |                 for dx in -r..=r {
+    |                     -- you must specify a type for this binding, like `i32`
+217 |                     for dz in -r..=r {
+218 |                         let corner = dx.abs() == r && dz.abs() == r;
+    |                                         ^^^
+
+error[E0689]: can't call method `abs` on ambiguous numeric type `{integer}`
+   --> crates/voxel/src/worldgen.rs:218:58
+    |
+217 |                     for dz in -r..=r {
+    |                         -- you must specify a type for this binding, like `i32`
+218 |                         let corner = dx.abs() == r && dz.abs() == r;
+    |                                                          ^^^
+
+warning: value assigned to `travelled` is never read
+   --> crates/voxel/src/raycast.rs:89:25
+    |
+ 89 |     let mut travelled = 0.0f32;
+    |                         ^^^^^^ this value is reassigned later and never used
+...
+104 |         travelled = t_max[axis];
+    |         ----------------------- `travelled` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+error[E0507]: cannot move out of `game.player` which is behind a shared reference
+   --> crates/voxel/src/ui.rs:286:13
+    |
+286 |     let p = game.player;
+    |             ^^^^^^^^^^^ move occurs because `game.player` has type `Player`, which does not implement the `Copy` trait
+    |
+help: consider borrowing here
+    |
+286 |     let p = &game.player;
+    |             +
+help: consider cloning the value if the performance cost is acceptable
+    |
+286 |     let p = game.player.clone();
+    |                        ++++++++
+
+warning: unused variable: `cold`
+   --> crates/voxel/src/worldgen.rs:366:17
+    |
+366 |             let cold = temps[i];
+    |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_cold`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+Some errors have detailed explanations: E0308, E0507, E0689.
+For more information about an error, try `rustc --explain E0308`.
+warning: `voxel` (lib) generated 2 warnings
+error: could not compile `voxel` (lib) due to 4 previous errors; 2 warnings emitted
+warning: build failed, waiting for other jobs to finish...

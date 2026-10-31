@@ -1,0 +1,81 @@
+   Compiling wasm-bindgen-macro v0.2.130
+    Checking voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
+    Checking ttf-parser v0.25.1
+    Checking xcursor v0.3.11
+   Compiling smithay-client-toolkit v0.18.1
+   Compiling zerocopy v0.8.63
+error[E0308]: mismatched types
+   --> crates/voxel/src/textures.rs:523:27
+    |
+523 |                 t.rect(x, y0, w.min(TILE_PX - 1 - x), 4, rgb(c));
+    |                   ----    ^^ expected `u32`, found `usize`
+    |                   |
+    |                   arguments to this method are incorrect
+    |
+note: method defined here
+   --> crates/voxel/src/textures.rs:162:8
+    |
+162 |     fn rect(&mut self, x: u32, y: u32, w: u32, h: u32, c: Rgba) {
+    |        ^^^^                    ------
+help: you can convert a `usize` to a `u32` and panic if the converted value doesn't fit
+    |
+523 |                 t.rect(x, y0.try_into().unwrap(), w.min(TILE_PX - 1 - x), 4, rgb(c));
+    |                             ++++++++++++++++++++
+
+error[E0689]: can't call method `abs` on ambiguous numeric type `{integer}`
+   --> crates/voxel/src/worldgen.rs:218:41
+    |
+216 |                 for dx in -r..=r {
+    |                     -- you must specify a type for this binding, like `i32`
+217 |                     for dz in -r..=r {
+218 |                         let corner = dx.abs() == r && dz.abs() == r;
+    |                                         ^^^
+
+error[E0689]: can't call method `abs` on ambiguous numeric type `{integer}`
+   --> crates/voxel/src/worldgen.rs:218:58
+    |
+217 |                     for dz in -r..=r {
+    |                         -- you must specify a type for this binding, like `i32`
+218 |                         let corner = dx.abs() == r && dz.abs() == r;
+    |                                                          ^^^
+
+    Checking wasm-bindgen v0.2.130
+warning: value assigned to `travelled` is never read
+   --> crates/voxel/src/raycast.rs:89:25
+    |
+ 89 |     let mut travelled = 0.0f32;
+    |                         ^^^^^^ this value is reassigned later and never used
+...
+104 |         travelled = t_max[axis];
+    |         ----------------------- `travelled` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+error[E0507]: cannot move out of `game.player` which is behind a shared reference
+   --> crates/voxel/src/ui.rs:286:13
+    |
+286 |     let p = game.player;
+    |             ^^^^^^^^^^^ move occurs because `game.player` has type `physics::Player`, which does not implement the `Copy` trait
+    |
+help: consider borrowing here
+    |
+286 |     let p = &game.player;
+    |             +
+help: consider cloning the value if the performance cost is acceptable
+    |
+286 |     let p = game.player.clone();
+    |                        ++++++++
+
+warning: unused variable: `cold`
+   --> crates/voxel/src/worldgen.rs:366:17
+    |
+366 |             let cold = temps[i];
+    |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_cold`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+Some errors have detailed explanations: E0308, E0507, E0689.
+For more information about an error, try `rustc --explain E0308`.
+warning: `voxel` (lib) generated 2 warnings
+error: could not compile `voxel` (lib) due to 4 previous errors; 2 warnings emitted
+warning: build failed, waiting for other jobs to finish...
