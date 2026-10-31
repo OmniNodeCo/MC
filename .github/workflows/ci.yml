@@ -77,11 +77,14 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: wasm-output
-          path: |
-            web/pkg
-            ci/wasm.log
-            ci/wasm.status
+          name: wasm-logs
+          path: ci/
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-pkg
+          path: web/pkg
           if-no-files-found: warn
       - name: Fail when the wasm build failed
         run: |
@@ -109,23 +112,18 @@ jobs:
       - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
-          name: wasm-output
-          path: ci/wasm-out
+          name: wasm-logs
+          path: ci
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: web-pkg
+          path: web/pkg
       - name: Publish
         run: |
           set -e
           mkdir -p ci
-          if [ -d ci/wasm-out/pkg ]; then
-            mkdir -p web/pkg
-            cp -r ci/wasm-out/pkg/. web/pkg/
-          fi
-          if [ -f ci/wasm-out/wasm.log ]; then
-            cp ci/wasm-out/wasm.log ci/wasm.log
-          fi
-          if [ -f ci/wasm-out/wasm.status ]; then
-            cp ci/wasm-out/wasm.status ci/wasm.status
-          fi
-          rm -rf ci/wasm-out
+          ls -la ci web/pkg 2>/dev/null || true
           {
             echo "native check: $(cat ci/check.status 2>/dev/null || echo missing)"
             echo "native test:  $(cat ci/test.status 2>/dev/null || echo missing)"

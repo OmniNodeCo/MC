@@ -174,7 +174,7 @@ impl Renderer {
 
         let eye = game.player.eye() + Vec3::new(0.0, game.player.bob, 0.0);
         let look = game.player.look_dir();
-        let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
+        let fov = (72.0_f32 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
         let aspect = self.gfx.aspect();
         let view = Mat4::look_to_rh(eye, look, Vec3::Y);
         let proj = Mat4::perspective_rh(fov, aspect, 0.06, 1400.0);
