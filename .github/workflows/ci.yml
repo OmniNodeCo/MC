@@ -132,17 +132,11 @@ jobs:
           mkdir -p ci web/pkg
           echo "--- downloaded artifacts ---"
           find /tmp/art-native /tmp/art-wasm /tmp/art-pkg -type f 2>/dev/null | head -40 || true
-          for f in check.log check.status test.log test.status build.log build.status; do
-            found=$(find /tmp/art-native -type f -name "$f" 2>/dev/null | head -1)
-            if [ -n "$found" ]; then cp -f "$found" "ci/$f"; fi
+          for f in $(find /tmp/art-native /tmp/art-wasm -type f 2>/dev/null); do
+            cp -f "$f" "ci/$(basename "$f")"
           done
-          for f in wasm.log wasm.status; do
-            found=$(find /tmp/art-wasm -type f -name "$f" 2>/dev/null | head -1)
-            if [ -n "$found" ]; then cp -f "$found" "ci/$f"; fi
-          done
-          for f in mc.js mc_bg.wasm mc.d.ts mc_bg.wasm.d.ts package.json; do
-            found=$(find /tmp/art-pkg -type f -name "$f" 2>/dev/null | head -1)
-            if [ -n "$found" ]; then cp -f "$found" "web/pkg/$f"; fi
+          for f in $(find /tmp/art-pkg -type f 2>/dev/null); do
+            cp -f "$f" "web/pkg/$(basename "$f")"
           done
           ls -la ci web/pkg
           {
