@@ -15,7 +15,7 @@ warning: `voxel` (lib) generated 1 warning
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
    Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
 warning: `voxel` (lib test) generated 1 warning (1 duplicate)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.49s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.32s
      Running unittests src/lib.rs (target/debug/deps/mc_client-fda619e0935b38e5)
 
 running 0 tests
@@ -27,7 +27,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 1 test
 test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.45s
 
      Running unittests src/main.rs (target/debug/deps/mc-21f40234b8b2a145)
 
@@ -47,9 +47,9 @@ running 38 tests
 test block::tests::every_id_has_a_def ... ok
 test block::tests::inventory_only_lists_real_blocks ... ok
 test block::tests::water_and_plants_are_not_solid ... ok
-test font::tests::every_glyph_row_is_five_wide ... ok
 test font::tests::glyph_cells_are_unique_per_char ... ok
 test font::tests::lowercase_maps_to_upper ... ok
+test font::tests::every_glyph_row_is_five_wide ... ok
 test game::tests::daylight_is_darker_at_midnight ... ok
 test game::tests::spawn_is_above_solid_ground ... ok
 test game::tests::creative_break_is_instant ... ok
@@ -71,19 +71,19 @@ test textures::tests::atlas_has_expected_size ... ok
 test textures::tests::stone_tile_is_not_empty ... ok
 test textures::tests::uvs_stay_in_unit_range ... ok
 test world::tests::edit_roundtrip ... ok
-test game::tests::survival_collects_blocks ... ok
 test world::tests::edits_survive_unload ... ok
-test world::tests::out_of_range_access_is_air ... ok
 test world::tests::loading_marks_neighbours_dirty ... ok
-test worldgen::tests::different_seeds_differ ... ok
+test world::tests::out_of_range_access_is_air ... ok
+test game::tests::survival_collects_blocks ... ok
 test worldgen::tests::generation_is_deterministic ... ok
+test worldgen::tests::different_seeds_differ ... ok
 test worldgen::tests::spawn_is_on_land ... ok
 test worldgen::tests::height_map_matches_blocks ... ok
 test worldgen::tests::surface_is_solid_and_covers_the_column ... ok
 test save::tests::rejects_garbage ... ok
 test save::tests::roundtrip_preserves_state ... ok
 
-test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.99s
 
    Doc-tests mc_client
 
@@ -117,12 +117,13 @@ warning: field `screen` is never read
 
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
 warning: `voxel` (lib) generated 1 warning
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.82s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.81s
      Running tests/gpu_smoke.rs (target/debug/deps/gpu_smoke-69a37505b3ef8983)
 
 running 1 test
-rendered 640x384: 270 distinct colour buckets, 91835 sky-ish pixels (37.4%), first pixel [98, 135, 70], samples [[98, 135, 70], [90, 123, 172], [94, 155, 54]], draws 12, tris 21544
+rendered 1280x720: 258 colour buckets, sky 38.7%, centre pixel [60, 80, 109], draws 16, tris 32248
+wrote /home/runner/work/MC/MC/crates/client/../../ci/frame.png
 test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.58s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.16s
 
