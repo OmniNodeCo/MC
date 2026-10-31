@@ -1,4 +1,4 @@
-run: 41235851189 Sat Oct 31 19:50:39 UTC 2026
+run: 41236311459 Sat Oct 31 19:59:02 UTC 2026
 native check: 101
 native test:  101
 native build: 101
@@ -9,85 +9,92 @@ wasm build:   0
     |
 233 |             let mut radius = 0i32;
 --
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
-    |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
+error[E0505]: cannot move out of `gfx` because it is borrowed
+  --> crates/client/tests/gpu_smoke.rs:55:38
+   |
 --
-error: could not compile `mc-client` (lib) due to 1 previous error
+error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
 ----- last lines -----
-    Checking ab_glyph_rasterizer v0.1.10
-    Checking ab_glyph v0.2.32
-    Checking tiny-skia v0.11.4
-    Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-    Checking gethostname v1.1.0
-   Compiling winit v0.29.15
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
-    |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
-    |                                                                          ^^^^^^^^^^
+21 |     let Ok(gfx) = pollster::block_on(Gfx::new_headless(WIDTH, HEIGHT)) else {
+   |            --- binding `gfx` declared here
+...
+26 |     let device = &gfx.device;
+   |                  ----------- borrow of `gfx.device` occurs here
+...
+55 |     let mut renderer = Renderer::new(gfx);
+   |                                      ^^^ move out of `gfx` occurs here
+...
+74 |     let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+   |                       ------ borrow later used here
 
-For more information about this error, try `rustc --explain E0689`.
-error: could not compile `mc-client` (lib) due to 1 previous error
+For more information about this error, try `rustc --explain E0505`.
+error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
 ===== test.log (tail) =====
    --> crates/voxel/src/worldgen.rs:233:30
     |
 233 |             let mut radius = 0i32;
 --
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
-    |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
+error[E0505]: cannot move out of `gfx` because it is borrowed
+  --> crates/client/tests/gpu_smoke.rs:55:38
+   |
 --
-error: could not compile `mc-client` (lib) due to 1 previous error
+error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
------ last lines -----
-   Compiling futures-util v0.3.34
-   Compiling wayland-protocols v0.31.2
-   Compiling polling v3.11.0
-   Compiling js-sys v0.3.107
-   Compiling calloop v0.12.4
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
+   Compiling bitflags v2.13.2
+--
+   --> crates/voxel/src/worldgen.rs:233:30
     |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
-    |                                                                          ^^^^^^^^^^
+233 |             let mut radius = 0i32;
+--
+error[E0505]: cannot move out of `gfx` because it is borrowed
+  --> crates/client/tests/gpu_smoke.rs:55:38
+   |
+--
+error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
+----- last lines -----
+   |
+21 |     let Ok(gfx) = pollster::block_on(Gfx::new_headless(WIDTH, HEIGHT)) else {
+   |            --- binding `gfx` declared here
+...
+26 |     let device = &gfx.device;
+   |                  ----------- borrow of `gfx.device` occurs here
+...
+55 |     let mut renderer = Renderer::new(gfx);
+   |                                      ^^^ move out of `gfx` occurs here
+...
+74 |     let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+   |                       ------ borrow later used here
 
-For more information about this error, try `rustc --explain E0689`.
-error: could not compile `mc-client` (lib) due to 1 previous error
-warning: build failed, waiting for other jobs to finish...
+For more information about this error, try `rustc --explain E0505`.
+error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
 ===== build.log (tail) =====
    --> crates/voxel/src/worldgen.rs:233:30
     |
 233 |             let mut radius = 0i32;
 --
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
-    |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
+error[E0308]: mismatched types
+  --> crates/desktop/src/main.rs:15:14
+   |
 --
-error: could not compile `mc-client` (lib) due to 1 previous error
-warning: build failed, waiting for other jobs to finish...
+error: could not compile `mc-desktop` (bin "mc") due to 1 previous error
 ----- last lines -----
-   Compiling xkbcommon-dl v0.4.2
-   Compiling wayland-protocols-plasma v0.2.0
    Compiling x11rb v0.13.2
-   Compiling percent-encoding v2.3.2
-   Compiling smol_str v0.2.2
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
-    |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
-    |                                                                          ^^^^^^^^^^
+   Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
+error[E0308]: mismatched types
+  --> crates/desktop/src/main.rs:15:14
+   |
+15 | fn main() -> Result<(), Box<dyn std::error::Error>> {
+   |    ----      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Result<(), Box<dyn Error>>`, found `()`
+   |    |
+   |    implicitly returns `()` as its body has no tail or `return` expression
+   |
+   = note:   expected enum `std::result::Result<(), Box<(dyn std::error::Error + 'static)>>`
+           found unit type `()`
 
-For more information about this error, try `rustc --explain E0689`.
-error: could not compile `mc-client` (lib) due to 1 previous error
-warning: build failed, waiting for other jobs to finish...
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `mc-desktop` (bin "mc") due to 1 previous error
 ===== wasm.log (tail) =====
    --> crates/voxel/src/worldgen.rs:233:30
     |
@@ -101,10 +108,10 @@ warning: build failed, waiting for other jobs to finish...
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
 warning: `voxel` (lib) generated 2 warnings
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `release` profile [optimized] target(s) in 3.39s
+    Finished `release` profile [optimized] target(s) in 3.10s
 [INFO]: ⬇️  Installing wasm-bindgen...
 [INFO]: Optional field missing from Cargo.toml: 'repository'. This is not necessary, but recommended
 [INFO]: License key is set in Cargo.toml but no LICENSE file(s) were found; Please add the LICENSE file(s) to your project directory
-[INFO]: ✨   Done in 4.89s
+[INFO]: ✨   Done in 4.04s
 [INFO]: 📦   Your wasm pkg is ready to publish at web/pkg.
 [WARN]: ⚠️   There's a newer version of wasm-pack available, the new version is: 0.15.1, you are using: 0.13.1. To update, navigate to: https://rustwasm.github.io/wasm-pack/installer/
