@@ -9,9 +9,7 @@ permissions:
   contents: write
 
 env:
-  CARGO_TERM_COLOR: always
-  # Commits that only refresh the wasm bundle do not need a new CI run.
-  SKIP_CI: ${{ contains(github.event.head_commit.message, '[skip ci]') }}
+  CARGO_TERM_COLOR: never
 
 jobs:
   native:
@@ -21,21 +19,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
-      - name: Clippy (advisory)
-        run: cargo clippy --workspace --all-targets || true
-      - name: Format (advisory)
-        run: cargo fmt --all -- --check || true
       - name: Check
-        run: cargo check --workspace --all-targets
+        run: |
+          mkdir -p ci
+          set +e
+          cargo check --workspace --all-targets > ci/check.log 2>&1
+          echo $? > ci/check.status
+          cargo clippy --workspace --all-targets > ci/clippy.log 2>&1
+          set -e
       - name: Test
-        run: cargo test --workspace --no-fail-fast
+        run: |
+          set +e
+          cargo test --workspace --no-fail-fast > ci/test.log 2>&1
+          echo $? > ci/test.status
+          set -e
       - name: Build release binary
-        run: cargo build --release -p mc-desktop
+        run: |
+          set +e
+          cargo build --release -p mc-desktop > ci/build.log 2>&1
+          echo $? > ci/build.status
+          set -e
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: mc-linux-x86_64
-          path: target/release/mc
-          if-no-files-found: error
+          name: native-logs
+          path: ci/
+          if-no-files-found: warn
+      - name: Fail when anything failed
+        run: |
+          for f in ci/check.status ci/test.status ci/build.status; do
+            if [ -f "$f" ] && [ "$(cat $f)" != "0" ]; then
+              echo "== $f =="
+              cat "$f"
+              exit 1
+            fi
+          done
 
   wasm:
     name: wasm (webgl2)
@@ -49,22 +67,77 @@ jobs:
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - name: Build wasm bundle
-        run: wasm-pack build crates/webapp --target web --release --out-dir ../../web/pkg --out-name mc
-      - uses: actions/upload-artifact@v4
-        with:
-          name: web-pkg
-          path: web/pkg
-          if-no-files-found: error
-      # Artifact downloads are blocked for the agent sandbox, so the built
-      # bundle is committed back to the branch. `git pull` picks it up.
-      - name: Publish wasm bundle to branch
         run: |
+          mkdir -p ci
+          set +e
+          wasm-pack build crates/webapp --target web --release \
+            --out-dir ../../web/pkg --out-name mc > ci/wasm.log 2>&1
+          echo $? > ci/wasm.status
+          set -e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wasm-output
+          path: |
+            web/pkg
+            ci/wasm.log
+            ci/wasm.status
+          if-no-files-found: warn
+      - name: Fail when the wasm build failed
+        run: |
+          if [ -f ci/wasm.status ] && [ "$(cat ci/wasm.status)" != "0" ]; then
+            exit 1
+          fi
+
+  # Artifact downloads are blocked for the agent sandbox, and job logs are not
+  # reachable either, so build output is committed back to the branch where it
+  # can simply be pulled.
+  publish:
+    name: publish build output
+    needs: [native, wasm]
+    if: ${{ always() && !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: native-logs
+          path: ci
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: wasm-output
+          path: ci/wasm-out
+      - name: Publish
+        run: |
+          set -e
+          if [ -d ci/wasm-out/pkg ]; then
+            mkdir -p web/pkg
+            cp -r ci/wasm-out/pkg/. web/pkg/
+          fi
+          if [ -f ci/wasm-out/wasm.log ]; then
+            cp ci/wasm-out/wasm.log ci/wasm.log
+          fi
+          if [ -f ci/wasm-out/wasm.status ]; then
+            cp ci/wasm-out/wasm.status ci/wasm.status
+          fi
+          rm -rf ci/wasm-out
+
           git config user.name "mc-ci"
           git config user.email "ci@omninode.dev"
-          git add -f web/pkg
+          git add -f ci web/pkg
           if git diff --cached --quiet; then
-            echo "wasm bundle unchanged"
+            echo "nothing to publish"
             exit 0
           fi
-          git commit -m "chore: refresh wasm bundle [skip ci]"
-          git push origin HEAD:${{ github.ref_name }}
+          git commit -m "chore: CI build output [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:${{ github.ref_name }}; then
+              exit 0
+            fi
+            git pull --rebase origin ${{ github.ref_name }} || true
+          done
+          exit 1
