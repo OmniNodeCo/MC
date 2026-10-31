@@ -164,6 +164,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => {}
         }
     })?;
+
+    Ok(())
 }
 
 fn apply_key(app: &mut App, code: KeyCode, down: bool) {

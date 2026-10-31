@@ -230,10 +230,9 @@ fn place_tree(
                 set_world(chunk, base_x, base_z, x, y + i, z, id::OAK_LOG);
             }
             let top = y + trunk_h - 1;
-            let mut radius = 0i32;
             for dy in (0..trunk_h - 1).rev() {
                 let level = (trunk_h - 1 - dy) as i32;
-                radius = if level % 3 == 0 { 2 } else { 1 };
+                let mut radius: i32 = if level % 3 == 0 { 2 } else { 1 };
                 if level > trunk_h - 3 {
                     radius = 1;
                 }
