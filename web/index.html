@@ -1,6 +1,37 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>MC Rust</title></head>
-<body><canvas id="game"></canvas>
-<script type="module">import init from './pkg/mc.js'; init().then(() => console.log('wasm ready'));</script>
-</body></html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>MC-RS &mdash; a Minecraft clone in Rust</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <canvas id="game" width="1280" height="720"></canvas>
+
+  <div id="overlay">
+    <div id="menu">
+      <h1 id="title">MC<span>-RS</span></h1>
+      <p id="subtitle">a Minecraft clone written in Rust &rarr; WebAssembly</p>
+
+      <button id="play" disabled>Loading&hellip;</button>
+      <p id="status">Starting&hellip;</p>
+
+      <div class="keys">
+        <div><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</div>
+        <div><kbd>Space</kbd> jump / swim</div>
+        <div><kbd>Shift</kbd> sneak &middot; <kbd>Ctrl</kbd> sprint</div>
+        <div><kbd>F</kbd> fly &middot; <kbd>G</kbd> survival / creative</div>
+        <div><kbd>Left</kbd> break &middot; <kbd>Right</kbd> place &middot; <kbd>Middle</kbd> pick</div>
+        <div><kbd>1</kbd>&ndash;<kbd>9</kbd> / wheel choose block</div>
+        <div><kbd>E</kbd> block palette &middot; <kbd>F3</kbd> debug</div>
+        <div><kbd>Esc</kbd> release mouse</div>
+      </div>
+
+      <p class="fine">The world is generated from seed <code>1337</code> and autosaves to this browser.</p>
+    </div>
+  </div>
+
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
