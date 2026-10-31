@@ -1,4 +1,4 @@
-run: 41236311459 Sat Oct 31 19:59:02 UTC 2026
+run: 41236828236 Sat Oct 31 20:04:44 UTC 2026
 native check: 101
 native test:  101
 native build: 101
@@ -9,66 +9,63 @@ wasm build:   0
     |
 233 |             let mut radius = 0i32;
 --
-error[E0505]: cannot move out of `gfx` because it is borrowed
-  --> crates/client/tests/gpu_smoke.rs:55:38
+error[E0308]: mismatched types
+  --> crates/desktop/src/main.rs:15:14
    |
 --
-error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
+error: could not compile `mc-desktop` (bin "mc") due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
+error: could not compile `mc-desktop` (bin "mc" test) due to 1 previous error
 ----- last lines -----
-21 |     let Ok(gfx) = pollster::block_on(Gfx::new_headless(WIDTH, HEIGHT)) else {
-   |            --- binding `gfx` declared here
-...
-26 |     let device = &gfx.device;
-   |                  ----------- borrow of `gfx.device` occurs here
-...
-55 |     let mut renderer = Renderer::new(gfx);
-   |                                      ^^^ move out of `gfx` occurs here
-...
-74 |     let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-   |                       ------ borrow later used here
+error[E0308]: mismatched types
+  --> crates/desktop/src/main.rs:15:14
+   |
+15 | fn main() -> Result<(), Box<dyn std::error::Error>> {
+   |    ----      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Result<(), Box<dyn Error>>`, found `()`
+   |    |
+   |    implicitly returns `()` as its body has no tail or `return` expression
+   |
+   = note:   expected enum `std::result::Result<(), Box<(dyn std::error::Error + 'static)>>`
+           found unit type `()`
 
-For more information about this error, try `rustc --explain E0505`.
-error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
+For more information about this error, try `rustc --explain E0308`.
+error: could not compile `mc-desktop` (bin "mc") due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
+error: could not compile `mc-desktop` (bin "mc" test) due to 1 previous error
 ===== test.log (tail) =====
    --> crates/voxel/src/worldgen.rs:233:30
     |
 233 |             let mut radius = 0i32;
 --
-error[E0505]: cannot move out of `gfx` because it is borrowed
-  --> crates/client/tests/gpu_smoke.rs:55:38
+error[E0308]: mismatched types
+  --> crates/desktop/src/main.rs:15:14
    |
 --
-error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
-warning: build failed, waiting for other jobs to finish...
+error: could not compile `mc-desktop` (bin "mc" test) due to 1 previous error
    Compiling bitflags v2.13.2
+   Compiling smallvec v1.16.4
 --
    --> crates/voxel/src/worldgen.rs:233:30
     |
 233 |             let mut radius = 0i32;
 --
-error[E0505]: cannot move out of `gfx` because it is borrowed
-  --> crates/client/tests/gpu_smoke.rs:55:38
-   |
---
-error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
+error: test failed, to rerun pass `-p mc-client --test gpu_smoke`
 ----- last lines -----
-   |
-21 |     let Ok(gfx) = pollster::block_on(Gfx::new_headless(WIDTH, HEIGHT)) else {
-   |            --- binding `gfx` declared here
-...
-26 |     let device = &gfx.device;
-   |                  ----------- borrow of `gfx.device` occurs here
-...
-55 |     let mut renderer = Renderer::new(gfx);
-   |                                      ^^^ move out of `gfx` occurs here
-...
-74 |     let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
-   |                       ------ borrow later used here
+    Render pipeline targets are incompatible with render pass
+    Incompatible depth-stencil attachment format: the RenderPass uses a texture with format Some(Depth24Plus) but the RenderPipeline uses an attachment with format None
 
-For more information about this error, try `rustc --explain E0505`.
-error: could not compile `mc-client` (test "gpu_smoke") due to 1 previous error
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test renders_a_world_frame_offscreen ... FAILED
+
+failures:
+
+failures:
+    renders_a_world_frame_offscreen
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+
+error: test failed, to rerun pass `-p mc-client --test gpu_smoke`
 ===== build.log (tail) =====
    --> crates/voxel/src/worldgen.rs:233:30
     |
@@ -80,7 +77,7 @@ error[E0308]: mismatched types
 --
 error: could not compile `mc-desktop` (bin "mc") due to 1 previous error
 ----- last lines -----
-   Compiling x11rb v0.13.2
+   Compiling pollster v0.3.0
    Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
 error[E0308]: mismatched types
   --> crates/desktop/src/main.rs:15:14
@@ -108,10 +105,10 @@ error: could not compile `mc-desktop` (bin "mc") due to 1 previous error
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
 warning: `voxel` (lib) generated 2 warnings
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `release` profile [optimized] target(s) in 3.10s
+    Finished `release` profile [optimized] target(s) in 2.08s
 [INFO]: ⬇️  Installing wasm-bindgen...
 [INFO]: Optional field missing from Cargo.toml: 'repository'. This is not necessary, but recommended
 [INFO]: License key is set in Cargo.toml but no LICENSE file(s) were found; Please add the LICENSE file(s) to your project directory
-[INFO]: ✨   Done in 4.04s
+[INFO]: ✨   Done in 3.01s
 [INFO]: 📦   Your wasm pkg is ready to publish at web/pkg.
 [WARN]: ⚠️   There's a newer version of wasm-pack available, the new version is: 0.15.1, you are using: 0.13.1. To update, navigate to: https://rustwasm.github.io/wasm-pack/installer/
