@@ -54,6 +54,23 @@ web/        HTML/JS shell (pointer lock, autosave, frame loop)
 - Block-break particles, and autosaving to disk (desktop) or `localStorage`
   (browser).
 
+## Build status
+
+Everything below is built and tested by GitHub Actions on every push:
+
+| Job | What it does |
+| --- | --- |
+| `native (linux)` | `cargo check --workspace --all-targets`, `cargo test` (38 unit tests + a headless GPU render test), `cargo build --release -p mc-desktop` |
+| `wasm (webgl2)` | `wasm-pack build crates/webapp --target web --release` into `web/pkg` |
+| `publish build output` | commits the logs (`ci/`) and the WebAssembly bundle (`web/pkg/`) back to the branch |
+
+The **headless GPU test** (`crates/client/tests/gpu_smoke.rs`) creates a real
+wgpu device on Mesa's software Vulkan driver, builds every pipeline, renders
+a frame of a generated world into an offscreen texture, reads the pixels back
+and asserts that the image actually contains sky and terrain geometry. That
+catches WGSL errors, bind-group/vertex-layout mismatches and attachment
+incompatibilities on CI machines without a GPU.
+
 ## Running natively
 
 Requires a stable Rust toolchain (1.75+).

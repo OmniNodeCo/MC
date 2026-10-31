@@ -146,6 +146,13 @@ jobs:
           done
           ls -la ci web/pkg
           {
+            echo "run ${{ github.run_id }} $(date -u)"
+            echo "--- artifact files ---"
+            find /tmp/art-native /tmp/art-wasm /tmp/art-pkg -type f 2>/dev/null | head -40
+            echo "--- git status before add ---"
+            git status --porcelain | head -20
+          } > ci/publish.log
+          {
             echo "run: ${{ github.run_id }} $(date -u)"
             echo "native check: $(cat ci/check.status 2>/dev/null || echo missing)"
             echo "native test:  $(cat ci/test.status 2>/dev/null || echo missing)"
@@ -169,6 +176,8 @@ jobs:
           if [ -d web/pkg ]; then
             git add -f web/pkg
           fi
+          echo "--- staged ---"
+          git diff --cached --name-only | head -30
           if git diff --cached --quiet; then
             echo "nothing to publish"
             exit 0
