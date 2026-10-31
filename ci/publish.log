@@ -1,0 +1,34 @@
+run 41238590311 Sat Oct 31 20:23:19 UTC 2026
+--- artifact files ---
+/tmp/art-native/wasm.log
+/tmp/art-native/wasm.status
+/tmp/art-native/test.log
+/tmp/art-native/build.status
+/tmp/art-native/test.status
+/tmp/art-native/build.log
+/tmp/art-native/check.log
+/tmp/art-native/summary.txt
+/tmp/art-native/check.status
+/tmp/art-native/clippy.log
+/tmp/art-wasm/wasm.log
+/tmp/art-wasm/wasm.status
+/tmp/art-wasm/test.log
+/tmp/art-wasm/build.status
+/tmp/art-wasm/test.status
+/tmp/art-wasm/build.log
+/tmp/art-wasm/check.log
+/tmp/art-wasm/summary.txt
+/tmp/art-wasm/check.status
+/tmp/art-wasm/clippy.log
+/tmp/art-pkg/mc_bg.wasm
+/tmp/art-pkg/mc_bg.wasm.d.ts
+/tmp/art-pkg/mc.js
+/tmp/art-pkg/package.json
+/tmp/art-pkg/mc.d.ts
+--- git status before add ---
+ M ci/build.log
+ M ci/check.log
+ M ci/test.log
+ M ci/test.status
+ M ci/wasm.log
+ M web/pkg/mc_bg.wasm
