@@ -1,4 +1,4 @@
-run 41239510577 Sat Oct 31 20:35:33 UTC 2026
+run 41239962761 Sat Oct 31 20:41:18 UTC 2026
 --- artifact files ---
 /tmp/art-native/wasm.log
 /tmp/art-native/wasm.status
@@ -23,6 +23,7 @@ run 41239510577 Sat Oct 31 20:35:33 UTC 2026
 /tmp/art-wasm/summary.txt
 /tmp/art-wasm/check.status
 /tmp/art-wasm/clippy.log
+/tmp/art-wasm/frame.png
 /tmp/art-pkg/mc_bg.wasm
 /tmp/art-pkg/mc_bg.wasm.d.ts
 /tmp/art-pkg/mc.js
