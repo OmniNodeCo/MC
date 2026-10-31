@@ -86,7 +86,6 @@ pub fn raycast(world: &World, origin: Vec3, dir: Vec3, max_dist: f32) -> Option<
     }
 
     let mut normal = [0i32; 3];
-    let mut travelled = 0.0f32;
     // Safety valve against pathological directions.
     for _ in 0..1024 {
         let id = world.get(cell[0], cell[1], cell[2]);
@@ -101,8 +100,7 @@ pub fn raycast(world: &World, origin: Vec3, dir: Vec3, max_dist: f32) -> Option<
         } else {
             2
         };
-        travelled = t_max[axis];
-        if travelled > max_dist {
+        if t_max[axis] > max_dist {
             return None;
         }
         cell[axis] += step[axis];

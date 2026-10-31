@@ -283,7 +283,7 @@ fn draw_palette(ui: &mut Ui, game: &Game, s: f32) {
 }
 
 fn draw_debug(ui: &mut Ui, game: &Game, s: f32) {
-    let p = game.player;
+    let p = &game.player;
     let lines: Vec<(String, [f32; 4])> = vec![
         (
             format!(

@@ -1,3 +1,5 @@
+#![cfg(target_arch = "wasm32")]
+
 //! WebAssembly entry point. HTML/JS owns input capture, pointer lock and
 //! localStorage; this module only translates those events into the shared
 //! client.

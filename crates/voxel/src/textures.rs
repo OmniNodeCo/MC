@@ -513,16 +513,16 @@ pub fn build_atlas() -> Vec<u8> {
             [72, 132, 72],
             [138, 72, 150],
         ];
-        for shelf in 0..2 {
-            let y0 = 3 + shelf * 7;
-            let mut x = 1;
-            let mut i = 0;
+        for shelf in 0..2u32 {
+            let y0: u32 = 3 + shelf * 7;
+            let mut x: u32 = 1;
+            let mut book = 0usize;
             while x < TILE_PX - 1 {
-                let c = books[(i + shelf * 2) % books.len()];
-                let w = 2;
+                let c = books[(book + shelf as usize * 2) % books.len()];
+                let w: u32 = 2;
                 t.rect(x, y0, w.min(TILE_PX - 1 - x), 4, rgb(c));
                 x += w + 1;
-                i += 1;
+                book += 1;
             }
         }
     }

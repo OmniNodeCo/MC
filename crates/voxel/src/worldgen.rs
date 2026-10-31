@@ -212,7 +212,7 @@ fn place_tree(
             }
             let top = y + trunk_h - 1;
             for dy in -2i32..=1 {
-                let r = if dy <= 0 { 2 } else { 1 };
+                let r: i32 = if dy <= 0 { 2 } else { 1 };
                 for dx in -r..=r {
                     for dz in -r..=r {
                         let corner = dx.abs() == r && dz.abs() == r;
@@ -346,7 +346,6 @@ pub fn generate_chunk(seed: u32, pos: ChunkPos) -> Chunk {
 
     let mut heights = [0i32; CHUNK_X * CHUNK_Z];
     let mut biomes = [Biome::Plains; CHUNK_X * CHUNK_Z];
-    let mut temps = [0.0f32; CHUNK_X * CHUNK_Z];
 
     for z in 0..CHUNK_Z {
         for x in 0..CHUNK_X {
@@ -354,7 +353,6 @@ pub fn generate_chunk(seed: u32, pos: ChunkPos) -> Chunk {
             let i = z * CHUNK_X + x;
             heights[i] = c.height;
             biomes[i] = c.biome;
-            temps[i] = c.temperature;
         }
     }
 
@@ -363,7 +361,6 @@ pub fn generate_chunk(seed: u32, pos: ChunkPos) -> Chunk {
             let i = z * CHUNK_X + x;
             let h = heights[i];
             let biome = biomes[i];
-            let cold = temps[i];
 
             // bedrock floor
             chunk.set(x, 0, z, id::BEDROCK);
@@ -410,11 +407,7 @@ pub fn generate_chunk(seed: u32, pos: ChunkPos) -> Chunk {
                 let block = if y == h {
                     surface
                 } else if y > h - soil {
-                    if y > h - soil - 1 && y == h - 1 {
-                        filler
-                    } else {
-                        filler
-                    }
+                    filler
                 } else {
                     ore_for(seed, base_x + x as i32, y, base_z + z as i32)
                 };
