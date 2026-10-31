@@ -23,10 +23,7 @@ fn renders_a_world_frame_offscreen() {
         return;
     };
 
-    let device = &gfx.device;
-    let queue = &gfx.queue;
-
-    let target = device.create_texture(&wgpu::TextureDescriptor {
+    let target = gfx.device.create_texture(&wgpu::TextureDescriptor {
         label: Some("smoke-target"),
         size: wgpu::Extent3d {
             width: WIDTH,
@@ -45,7 +42,7 @@ fn renders_a_world_frame_offscreen() {
     // 640 * 4 == 2560 bytes per row, already a multiple of the 256 byte copy
     // alignment required by `copy_texture_to_buffer`.
     let bytes_per_row = WIDTH * 4;
-    let readback = device.create_buffer(&wgpu::BufferDescriptor {
+    let readback = gfx.device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("smoke-readback"),
         size: (bytes_per_row * HEIGHT) as u64,
         usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::MAP_READ,
@@ -71,6 +68,8 @@ fn renders_a_world_frame_offscreen() {
         "renderer recorded no draw calls at all"
     );
 
+    let device = &renderer.gfx.device;
+    let queue = &renderer.gfx.queue;
     let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
         label: Some("smoke-copy"),
     });

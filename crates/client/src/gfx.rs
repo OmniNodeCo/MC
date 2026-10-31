@@ -46,6 +46,8 @@ const LINE_ATTRS: [wgpu::VertexAttribute; 2] = wgpu::vertex_attr_array![
 ];
 
 pub struct Gfx {
+    /// Kept alive for the lifetime of the device.
+    pub instance: wgpu::Instance,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub surface: Option<wgpu::Surface<'static>>,
@@ -117,7 +119,7 @@ impl Gfx {
         };
         surface.configure(&device, &config);
 
-        Self::build(device, queue, Some(surface), format, width, height)
+        Self::build(instance, device, queue, Some(surface), format, width, height)
     }
 
     /// Create the renderer without a window. Used by the GPU smoke test.
@@ -136,6 +138,7 @@ impl Gfx {
             .ok_or_else(|| "no GPU adapter available".to_string())?;
         let (device, queue) = request_device(&adapter).await?;
         Self::build(
+            instance,
             device,
             queue,
             None,
@@ -146,6 +149,7 @@ impl Gfx {
     }
 
     fn build(
+        instance: wgpu::Instance,
         device: wgpu::Device,
         queue: wgpu::Queue,
         surface: Option<wgpu::Surface<'static>>,
@@ -471,6 +475,7 @@ impl Gfx {
         }
 
         Ok(Self {
+            instance,
             device,
             queue,
             surface,
