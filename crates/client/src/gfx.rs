@@ -339,6 +339,13 @@ impl Gfx {
             blend: None,
             write_mask: wgpu::ColorWrites::ALL,
         });
+        let always_depth = Some(wgpu::DepthStencilState {
+            format: DEPTH_FORMAT,
+            depth_write_enabled: false,
+            depth_compare: wgpu::CompareFunction::Always,
+            stencil: wgpu::StencilState::default(),
+            bias: wgpu::DepthBiasState::default(),
+        });
         let blend_target = Some(wgpu::ColorTargetState {
             format,
             blend: Some(wgpu::BlendState::ALPHA_BLENDING),
@@ -429,7 +436,7 @@ impl Gfx {
             &terrain_buffers,
             wgpu::PrimitiveTopology::TriangleList,
             Some(wgpu::Face::Back),
-            None,
+            always_depth.clone(),
             color_target.clone(),
         );
         let sky_pipeline = make_pipeline(
@@ -440,7 +447,7 @@ impl Gfx {
             &[],
             wgpu::PrimitiveTopology::TriangleList,
             None,
-            None,
+            always_depth.clone(),
             color_target.clone(),
         );
         let line_pipeline = make_pipeline(
@@ -466,7 +473,7 @@ impl Gfx {
             &[ui_layout],
             wgpu::PrimitiveTopology::TriangleList,
             None,
-            None,
+            always_depth.clone(),
             blend_target,
         );
 
