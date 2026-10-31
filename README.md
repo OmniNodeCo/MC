@@ -8,6 +8,13 @@ first-person physics, an inventory hotbar, a block palette and a save file.
 It runs **natively** (winit + wgpu) and **in the browser** (the same Rust code
 compiled to WebAssembly, rendering through WebGL2).
 
+![Screenshot of the game](docs/screenshot.png)
+
+*An unmodified frame of the renderer, captured by the automated GPU test
+(`crates/client/tests/gpu_smoke.rs`) on a software Vulkan driver — terrain,
+beach, ocean, a birch trunk, a tree canopy, a cactus and the HUD, all drawn by
+the code in this repository.*
+
 ```
 crates/
   voxel/    game simulation: world gen, meshing, physics, inventory, HUD — no I/O
