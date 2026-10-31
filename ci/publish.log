@@ -1,4 +1,4 @@
-run 41239051760 Sat Oct 31 20:29:28 UTC 2026
+run 41239510577 Sat Oct 31 20:35:33 UTC 2026
 --- artifact files ---
 /tmp/art-native/wasm.log
 /tmp/art-native/wasm.status
@@ -29,8 +29,5 @@ run 41239051760 Sat Oct 31 20:29:28 UTC 2026
 /tmp/art-pkg/package.json
 /tmp/art-pkg/mc.d.ts
 --- git status before add ---
- M ci/build.log
- M ci/check.log
  M ci/publish.log
- M ci/test.log
  M ci/wasm.log
