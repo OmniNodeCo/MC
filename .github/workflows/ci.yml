@@ -114,6 +114,7 @@ jobs:
       - name: Publish
         run: |
           set -e
+          mkdir -p ci
           if [ -d ci/wasm-out/pkg ]; then
             mkdir -p web/pkg
             cp -r ci/wasm-out/pkg/. web/pkg/
@@ -125,10 +126,20 @@ jobs:
             cp ci/wasm-out/wasm.status ci/wasm.status
           fi
           rm -rf ci/wasm-out
+          {
+            echo "native check: $(cat ci/check.status 2>/dev/null || echo missing)"
+            echo "native test:  $(cat ci/test.status 2>/dev/null || echo missing)"
+            echo "native build: $(cat ci/build.status 2>/dev/null || echo missing)"
+            echo "wasm build:   $(cat ci/wasm.status 2>/dev/null || echo missing)"
+          } > ci/summary.txt
+          cat ci/summary.txt
 
           git config user.name "mc-ci"
           git config user.email "ci@omninode.dev"
-          git add -f ci web/pkg
+          git add -f -A ci
+          if [ -d web/pkg ]; then
+            git add -f web/pkg
+          fi
           if git diff --cached --quiet; then
             echo "nothing to publish"
             exit 0
