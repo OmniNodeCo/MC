@@ -125,12 +125,22 @@ jobs:
           mkdir -p ci
           ls -la ci web/pkg 2>/dev/null || true
           {
+            echo "run: ${{ github.run_id }} $(date -u)"
             echo "native check: $(cat ci/check.status 2>/dev/null || echo missing)"
             echo "native test:  $(cat ci/test.status 2>/dev/null || echo missing)"
             echo "native build: $(cat ci/build.status 2>/dev/null || echo missing)"
             echo "wasm build:   $(cat ci/wasm.status 2>/dev/null || echo missing)"
+            echo
+            for f in check test build wasm; do
+              if [ -f "ci/$f.log" ]; then
+                echo "===== $f.log (tail) ====="
+                grep -E "^(error|warning: unused|   -->|error\[)" -A 2 "ci/$f.log" | head -60
+                echo "----- last lines -----"
+                tail -n 15 "ci/$f.log"
+              fi
+            done
           } > ci/summary.txt
-          cat ci/summary.txt
+          head -60 ci/summary.txt
 
           git config user.name "mc-ci"
           git config user.email "ci@omninode.dev"
