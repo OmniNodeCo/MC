@@ -1,0 +1,17 @@
+{
+  "name": "mc-web",
+  "type": "module",
+  "description": "WebAssembly build of the voxel game",
+  "version": "0.1.0",
+  "license": "MIT",
+  "files": [
+    "mc_bg.wasm",
+    "mc.js",
+    "mc.d.ts"
+  ],
+  "main": "mc.js",
+  "types": "mc.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
