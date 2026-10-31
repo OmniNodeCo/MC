@@ -19,6 +19,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
+      - name: Install software Vulkan driver
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libvulkan1 mesa-vulkan-drivers || true
+          ls /usr/share/vulkan/icd.d/ || true
       - name: Check
         run: |
           mkdir -p ci
@@ -30,8 +35,10 @@ jobs:
       - name: Test
         run: |
           set +e
+          export LIBGL_ALWAYS_SOFTWARE=1
           cargo test --workspace --no-fail-fast > ci/test.log 2>&1
           echo $? > ci/test.status
+          cargo test -p mc-client --test gpu_smoke -- --nocapture >> ci/test.log 2>&1
           set -e
       - name: Build release binary
         run: |
@@ -108,22 +115,36 @@ jobs:
         continue-on-error: true
         with:
           name: native-logs
-          path: ci
+          path: /tmp/art-native
       - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
           name: wasm-logs
-          path: ci
+          path: /tmp/art-wasm
       - uses: actions/download-artifact@v4
         continue-on-error: true
         with:
           name: web-pkg
-          path: web/pkg
+          path: /tmp/art-pkg
       - name: Publish
         run: |
           set -e
-          mkdir -p ci
-          ls -la ci web/pkg 2>/dev/null || true
+          mkdir -p ci web/pkg
+          echo "--- downloaded artifacts ---"
+          find /tmp/art-native /tmp/art-wasm /tmp/art-pkg -type f 2>/dev/null | head -40 || true
+          for f in check.log check.status test.log test.status build.log build.status; do
+            found=$(find /tmp/art-native -type f -name "$f" 2>/dev/null | head -1)
+            if [ -n "$found" ]; then cp -f "$found" "ci/$f"; fi
+          done
+          for f in wasm.log wasm.status; do
+            found=$(find /tmp/art-wasm -type f -name "$f" 2>/dev/null | head -1)
+            if [ -n "$found" ]; then cp -f "$found" "ci/$f"; fi
+          done
+          for f in mc.js mc_bg.wasm mc.d.ts mc_bg.wasm.d.ts package.json; do
+            found=$(find /tmp/art-pkg -type f -name "$f" 2>/dev/null | head -1)
+            if [ -n "$found" ]; then cp -f "$found" "web/pkg/$f"; fi
+          done
+          ls -la ci web/pkg
           {
             echo "run: ${{ github.run_id }} $(date -u)"
             echo "native check: $(cat ci/check.status 2>/dev/null || echo missing)"

@@ -170,6 +170,29 @@ impl Renderer {
     }
 
     pub fn render(&mut self, game: &mut Game, elapsed: f32) {
+        let frame = {
+            let Some(surface) = self.gfx.surface.as_ref() else {
+                return;
+            };
+            match surface.get_current_texture() {
+                Ok(frame) => frame,
+                Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
+                    surface.configure(&self.gfx.device, &self.gfx.config);
+                    return;
+                }
+                Err(_) => return,
+            }
+        };
+        let view_tex = frame
+            .texture
+            .create_view(&wgpu::TextureViewDescriptor::default());
+        self.draw(game, elapsed, &view_tex);
+        frame.present();
+    }
+
+    /// Draw one complete frame into `view_tex`. Split out from [`Self::render`]
+    /// so the pipeline can be exercised without a window (see the GPU smoke test).
+    pub fn draw(&mut self, game: &mut Game, elapsed: f32, view_tex: &wgpu::TextureView) {
         self.refresh_chunks(game);
 
         let eye = game.player.eye() + Vec3::new(0.0, game.player.bob, 0.0);
@@ -367,17 +390,6 @@ impl Renderer {
         }
 
         // ---- draw ----------------------------------------------------------
-        let frame = match self.gfx.surface.get_current_texture() {
-            Ok(frame) => frame,
-            Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
-                self.gfx.surface.configure(&self.gfx.device, &self.gfx.config);
-                return;
-            }
-            Err(_) => return,
-        };
-        let view_tex = frame
-            .texture
-            .create_view(&wgpu::TextureViewDescriptor::default());
         let clear = wgpu::Color {
             r: sky[0] as f64 * 0.55,
             g: sky[1] as f64 * 0.55,
@@ -394,7 +406,7 @@ impl Renderer {
             let mut pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("main"),
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view_tex,
+                    view: view_tex,
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(clear),
@@ -510,7 +522,6 @@ impl Renderer {
             self.visible_chunks = visible;
         }
         self.gfx.queue.submit(Some(encoder.finish()));
-        frame.present();
 
         game.draw_calls = draw_calls;
         game.triangles_drawn = triangles;

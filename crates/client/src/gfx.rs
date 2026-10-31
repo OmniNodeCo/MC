@@ -48,7 +48,7 @@ const LINE_ATTRS: [wgpu::VertexAttribute; 2] = wgpu::vertex_attr_array![
 pub struct Gfx {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
-    pub surface: wgpu::Surface<'static>,
+    pub surface: Option<wgpu::Surface<'static>>,
     pub config: wgpu::SurfaceConfiguration,
     pub depth_view: wgpu::TextureView,
     pub srgb_output: bool,
@@ -73,6 +73,7 @@ pub struct Gfx {
 }
 
 impl Gfx {
+    /// Create the renderer for a window / canvas surface.
     pub async fn new(
         instance: wgpu::Instance,
         surface: wgpu::Surface<'static>,
@@ -91,18 +92,7 @@ impl Gfx {
             .await
             .ok_or_else(|| "no compatible GPU adapter found".to_string())?;
 
-        let limits = wgpu::Limits::downlevel_webgl2_defaults().using_resolution(adapter.limits());
-        let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: Some("mc-device"),
-                    required_features: wgpu::Features::empty(),
-                    required_limits: limits,
-                },
-                None,
-            )
-            .await
-            .map_err(|e| format!("could not create GPU device: {e}"))?;
+        let (device, queue) = request_device(&adapter).await?;
 
         let caps = surface.get_capabilities(&adapter);
         if caps.formats.is_empty() {
@@ -127,6 +117,52 @@ impl Gfx {
         };
         surface.configure(&device, &config);
 
+        Self::build(device, queue, Some(surface), format, width, height)
+    }
+
+    /// Create the renderer without a window. Used by the GPU smoke test.
+    pub async fn new_headless(width: u32, height: u32) -> Result<Self, String> {
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
+            backends: wgpu::Backends::all(),
+            ..Default::default()
+        });
+        let adapter = instance
+            .request_adapter(&wgpu::RequestAdapterOptions {
+                power_preference: wgpu::PowerPreference::HighPerformance,
+                force_fallback_adapter: false,
+                compatible_surface: None,
+            })
+            .await
+            .ok_or_else(|| "no GPU adapter available".to_string())?;
+        let (device, queue) = request_device(&adapter).await?;
+        Self::build(
+            device,
+            queue,
+            None,
+            wgpu::TextureFormat::Rgba8Unorm,
+            width.max(1),
+            height.max(1),
+        )
+    }
+
+    fn build(
+        device: wgpu::Device,
+        queue: wgpu::Queue,
+        surface: Option<wgpu::Surface<'static>>,
+        format: wgpu::TextureFormat,
+        width: u32,
+        height: u32,
+    ) -> Result<Self, String> {
+        let config = wgpu::SurfaceConfiguration {
+            usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+            format,
+            width,
+            height,
+            present_mode: wgpu::PresentMode::Fifo,
+            desired_maximum_frame_latency: 2,
+            alpha_mode: wgpu::CompositeAlphaMode::Auto,
+            view_formats: vec![],
+        };
         let depth_view = create_depth_view(&device, width, height);
 
         // ---- shared bind group ------------------------------------------
@@ -344,7 +380,7 @@ impl Gfx {
             })
         };
 
-        let terrain_buffers = [terrain_layout.clone()];
+        let terrain_buffers = [terrain_layout];
         let terrain_pipeline = make_pipeline(
             "terrain",
             &terrain_shader,
@@ -430,6 +466,10 @@ impl Gfx {
             blend_target,
         );
 
+        if let Some(surface) = &surface {
+            surface.configure(&device, &config);
+        }
+
         Ok(Self {
             device,
             queue,
@@ -463,7 +503,9 @@ impl Gfx {
         }
         self.config.width = width;
         self.config.height = height;
-        self.surface.configure(&self.device, &self.config);
+        if let Some(surface) = &self.surface {
+            surface.configure(&self.device, &self.config);
+        }
         self.depth_view = create_depth_view(&self.device, width, height);
     }
 
@@ -480,6 +522,21 @@ impl Gfx {
         self.queue
             .write_buffer(&self.hand_buffer, 0, bytemuck::bytes_of(uniform));
     }
+}
+
+async fn request_device(adapter: &wgpu::Adapter) -> Result<(wgpu::Device, wgpu::Queue), String> {
+    let limits = wgpu::Limits::downlevel_webgl2_defaults().using_resolution(adapter.limits());
+    adapter
+        .request_device(
+            &wgpu::DeviceDescriptor {
+                label: Some("mc-device"),
+                required_features: wgpu::Features::empty(),
+                required_limits: limits,
+            },
+            None,
+        )
+        .await
+        .map_err(|e| format!("could not create GPU device: {e}"))
 }
 
 fn create_depth_view(device: &wgpu::Device, width: u32, height: u32) -> wgpu::TextureView {
