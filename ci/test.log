@@ -9,69 +9,58 @@
    Compiling libc v0.2.191
    Compiling linux-raw-sys v0.12.1
    Compiling arrayvec v0.7.8
+   Compiling dlib v0.5.3
    Compiling quote v1.0.47
    Compiling syn v3.0.9
    Compiling syn v2.0.119
    Compiling rustix v1.1.6
-   Compiling dlib v0.5.3
-   Compiling equivalent v1.0.3
-   Compiling scopeguard v1.2.0
-   Compiling termcolor v1.4.1
-   Compiling unicode-width v0.1.14
-   Compiling bit-vec v0.6.3
    Compiling foldhash v0.1.5
    Compiling slab v0.4.12
    Compiling hashbrown v0.17.1
-   Compiling indexmap v2.14.2
-   Compiling hashbrown v0.15.5
-   Compiling bit-set v0.5.3
+   Compiling equivalent v1.0.3
+   Compiling bit-vec v0.6.3
+   Compiling scopeguard v1.2.0
+   Compiling termcolor v1.4.1
+   Compiling unicode-width v0.1.14
    Compiling codespan-reporting v0.11.1
    Compiling lock_api v0.4.14
+   Compiling bit-set v0.5.3
+   Compiling indexmap v2.14.2
+   Compiling hashbrown v0.15.5
    Compiling num-traits v0.2.19
    Compiling wayland-sys v0.31.11
    Compiling parking_lot_core v0.9.12
+   Compiling gpu-descriptor-types v0.2.0
    Compiling spirv v0.3.0+sdk-1.3.268.0
    Compiling gpu-alloc-types v0.3.1
-   Compiling gpu-descriptor-types v0.2.0
    Compiling libloading v0.7.4
-   Compiling downcast-rs v1.2.1
-   Compiling unicode-xid v0.2.6
    Compiling scoped-tls v1.0.1
    Compiling rustc-hash v1.1.0
    Compiling raw-window-handle v0.6.2
    Compiling hexf-parse v0.2.1
+   Compiling downcast-rs v1.2.1
+   Compiling unicode-xid v0.2.6
    Compiling wayland-backend v0.3.17
    Compiling ash v0.37.3+1.3.251
    Compiling thiserror-impl v1.0.69
-   Compiling gpu-descriptor v0.3.2
    Compiling gpu-alloc v0.6.2
-   Compiling thiserror v1.0.69
+   Compiling gpu-descriptor v0.3.2
    Compiling parking_lot v0.12.5
+   Compiling thiserror v1.0.69
    Compiling naga v0.20.0
    Compiling khronos-egl v6.0.0
    Compiling wgpu-types v0.20.0
-   Compiling glow v0.13.1
-   Compiling profiling v1.0.18
    Compiling renderdoc-sys v1.1.0
    Compiling glam v0.27.0
+   Compiling profiling v1.0.18
+   Compiling glow v0.13.1
    Compiling wayland-scanner v0.31.11
-   Compiling bytemuck_derive v1.12.1
    Compiling wgpu-hal v0.21.1
+   Compiling bytemuck_derive v1.12.1
    Compiling wasm-bindgen-shared v0.2.130
    Compiling wasm-bindgen-macro-support v0.2.130
    Compiling bytemuck v1.25.2
    Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
-warning: value assigned to `radius` is never read
-   --> crates/voxel/src/worldgen.rs:233:30
-    |
-233 |             let mut radius = 0i32;
-    |                              ^^^^ this value is reassigned later and never used
-...
-236 |                 radius = if level % 3 == 0 { 2 } else { 1 };
-    |                 ------------------------------------------- `radius` is overwritten here before the previous value is read
-    |
-    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
-
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
    |
@@ -83,9 +72,9 @@ warning: field `screen` is never read
    |
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-warning: `voxel` (lib) generated 2 warnings
-   Compiling wgpu-core v0.21.1
+warning: `voxel` (lib) generated 1 warning
    Compiling wayland-client v0.31.15
+   Compiling wgpu-core v0.21.1
    Compiling static_assertions v1.1.0
    Compiling wgpu v0.20.1
    Compiling linux-raw-sys v0.4.15
@@ -94,92 +83,181 @@ warning: `voxel` (lib) generated 2 warnings
    Compiling futures-task v0.3.34
    Compiling futures-util v0.3.34
    Compiling rustix v0.38.44
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-   Compiling wayland-protocols v0.31.2
    Compiling wasm-bindgen-macro v0.2.130
    Compiling wasm-bindgen v0.2.130
+   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+   Compiling wayland-protocols v0.31.2
    Compiling polling v3.11.0
    Compiling calloop v0.12.4
    Compiling js-sys v0.3.107
-   Compiling cursor-icon v1.2.0
-   Compiling strict-num v0.1.1
-   Compiling ttf-parser v0.25.1
    Compiling xcursor v0.3.11
    Compiling xkeysym v0.2.1
    Compiling arrayref v0.3.9
-   Compiling tiny-skia-path v0.11.4
-   Compiling wayland-cursor v0.31.14
+   Compiling cursor-icon v1.2.0
+   Compiling strict-num v0.1.1
+   Compiling ttf-parser v0.25.1
    Compiling owned_ttf_parser v0.25.1
+   Compiling tiny-skia-path v0.11.4
    Compiling wayland-csd-frame v0.3.0
+   Compiling wayland-cursor v0.31.14
    Compiling wayland-protocols-wlr v0.2.0
    Compiling calloop-wayland-source v0.2.0
    Compiling memmap2 v0.9.12
-   Compiling pollster v0.3.0
    Compiling ab_glyph_rasterizer v0.1.10
+   Compiling pollster v0.3.0
    Compiling ab_glyph v0.2.32
-   Compiling getrandom v0.3.4
-   Compiling zerocopy v0.8.63
    Compiling smithay-client-toolkit v0.18.1
+   Compiling zerocopy v0.8.63
+   Compiling getrandom v0.3.4
    Compiling tiny-skia v0.11.4
    Compiling wasm-bindgen-futures v0.4.80
    Compiling web-sys v0.3.107
    Compiling console_error_panic_hook v0.1.7
    Compiling gethostname v1.1.0
-   Compiling x11rb-protocol v0.13.2
    Compiling as-raw-xcb-connection v1.0.1
-   Compiling sctk-adwaita v0.8.3
+   Compiling x11rb-protocol v0.13.2
    Compiling ahash v0.8.12
+   Compiling sctk-adwaita v0.8.3
    Compiling x11-dl v2.21.0
    Compiling xkbcommon-dl v0.4.2
    Compiling wayland-protocols-plasma v0.2.0
    Compiling smol_str v0.2.2
    Compiling percent-encoding v2.3.2
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
+warning: `voxel` (lib test) generated 1 warning (1 duplicate)
    Compiling x11rb v0.13.2
    Compiling winit v0.29.15
-warning: `voxel` (lib test) generated 2 warnings (2 duplicates)
    Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
-error[E0308]: mismatched types
-  --> crates/desktop/src/main.rs:15:14
-   |
-15 | fn main() -> Result<(), Box<dyn std::error::Error>> {
-   |    ----      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `Result<(), Box<dyn Error>>`, found `()`
-   |    |
-   |    implicitly returns `()` as its body has no tail or `return` expression
-   |
-   = note:   expected enum `std::result::Result<(), Box<(dyn std::error::Error + 'static)>>`
-           found unit type `()`
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 13s
+     Running unittests src/lib.rs (target/debug/deps/mc_client-fda619e0935b38e5)
 
-For more information about this error, try `rustc --explain E0308`.
-error: could not compile `mc-desktop` (bin "mc" test) due to 1 previous error
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/gpu_smoke.rs (target/debug/deps/gpu_smoke-88a783f2205b784d)
+
+running 1 test
+test renders_a_world_frame_offscreen ... FAILED
+
+failures:
+
+---- renders_a_world_frame_offscreen stdout ----
+
+thread 'renders_a_world_frame_offscreen' (6206) panicked at /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wgpu-0.20.1/src/backend/wgpu_core.rs:2996:5:
+wgpu error: Validation Error
+
+Caused by:
+    In a RenderPass
+      note: encoder = `<CommandBuffer-(0, 1, Vulkan)>`
+    In a set_pipeline command
+      note: render pipeline = `sky`
+    Render pipeline targets are incompatible with render pass
+    Incompatible depth-stencil attachment format: the RenderPass uses a texture with format Some(Depth24Plus) but the RenderPipeline uses an attachment with format None
+
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    renders_a_world_frame_offscreen
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.01s
+
+error: test failed, to rerun pass `-p mc-client --test gpu_smoke`
+     Running unittests src/main.rs (target/debug/deps/mc-21f40234b8b2a145)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/mc_web-044788d5ea4b9363)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/voxel-1c877c120d599117)
+
+running 38 tests
+test block::tests::every_id_has_a_def ... ok
+test block::tests::water_and_plants_are_not_solid ... ok
+test font::tests::glyph_cells_are_unique_per_char ... ok
+test font::tests::lowercase_maps_to_upper ... ok
+test font::tests::every_glyph_row_is_five_wide ... ok
+test block::tests::inventory_only_lists_real_blocks ... ok
+test game::tests::spawn_is_above_solid_ground ... ok
+test game::tests::daylight_is_darker_at_midnight ... ok
+test game::tests::hotbar_wraps_around ... ok
+test game::tests::creative_break_is_instant ... ok
+test mesher::tests::unit_cube_has_24_vertices ... ok
+test mesher::tests::flat_world_emits_only_top_faces ... ok
+test mesher::tests::water_goes_to_its_own_buffer ... ok
+test noise::tests::hashes_are_deterministic ... ok
+test noise::tests::rng_is_reproducible ... ok
+test noise::tests::noise_stays_in_range ... ok
+test physics::tests::look_direction_is_unit_length ... ok
+test physics::tests::walls_block_movement ... ok
+test raycast::tests::hits_the_block_below ... ok
+test raycast::tests::misses_when_out_of_range ... ok
+test physics::tests::falls_until_it_lands ... ok
+test raycast::tests::water_is_transparent_to_rays ... ok
+test game::tests::streaming_loads_chunks_around_the_player ... ok
+test textures::tests::atlas_has_expected_size ... ok
+test textures::tests::stone_tile_is_not_empty ... ok
+test textures::tests::uvs_stay_in_unit_range ... ok
+test world::tests::edit_roundtrip ... ok
+test world::tests::edits_survive_unload ... ok
+test world::tests::loading_marks_neighbours_dirty ... ok
+test world::tests::out_of_range_access_is_air ... ok
+test worldgen::tests::different_seeds_differ ... ok
+test worldgen::tests::generation_is_deterministic ... ok
+test worldgen::tests::height_map_matches_blocks ... ok
+test worldgen::tests::spawn_is_on_land ... ok
+test worldgen::tests::surface_is_solid_and_covers_the_column ... ok
+test game::tests::survival_collects_blocks ... ok
+test save::tests::rejects_garbage ... ok
+test save::tests::roundtrip_preserves_state ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.59s
+
+   Doc-tests mc_client
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests mc_web
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests voxel
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: 1 target failed:
+    `-p mc-client --test gpu_smoke`
    Compiling bitflags v2.13.2
    Compiling smallvec v1.16.4
    Compiling thiserror v1.0.69
    Compiling syn v3.0.9
    Compiling wgpu v0.20.1
    Compiling parking_lot_core v0.9.12
+   Compiling spirv v0.3.0+sdk-1.3.268.0
    Compiling gpu-alloc-types v0.3.1
    Compiling gpu-descriptor-types v0.2.0
-   Compiling spirv v0.3.0+sdk-1.3.268.0
-   Compiling gpu-descriptor v0.3.2
    Compiling gpu-alloc v0.6.2
+   Compiling gpu-descriptor v0.3.2
    Compiling parking_lot v0.12.5
    Compiling naga v0.20.0
    Compiling wgpu-types v0.20.0
    Compiling bytemuck_derive v1.12.1
    Compiling bytemuck v1.25.2
    Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
-warning: value assigned to `radius` is never read
-   --> crates/voxel/src/worldgen.rs:233:30
-    |
-233 |             let mut radius = 0i32;
-    |                              ^^^^ this value is reassigned later and never used
-...
-236 |                 radius = if level % 3 == 0 { 2 } else { 1 };
-    |                 ------------------------------------------- `radius` is overwritten here before the previous value is read
-    |
-    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
-
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
    |
@@ -192,15 +270,15 @@ warning: field `screen` is never read
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
    Compiling wgpu-hal v0.21.1
-warning: `voxel` (lib) generated 2 warnings
+warning: `voxel` (lib) generated 1 warning
    Compiling wgpu-core v0.21.1
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 37.12s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 48.71s
      Running tests/gpu_smoke.rs (target/debug/deps/gpu_smoke-69a37505b3ef8983)
 
 running 1 test
 
-thread 'renders_a_world_frame_offscreen' (6333) panicked at /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wgpu-0.20.1/src/backend/wgpu_core.rs:2996:5:
+thread 'renders_a_world_frame_offscreen' (6772) panicked at /home/runner/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/wgpu-0.20.1/src/backend/wgpu_core.rs:2996:5:
 wgpu error: Validation Error
 
 Caused by:
@@ -220,6 +298,6 @@ failures:
 failures:
     renders_a_world_frame_offscreen
 
-test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.96s
 
 error: test failed, to rerun pass `-p mc-client --test gpu_smoke`

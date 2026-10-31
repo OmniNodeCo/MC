@@ -1,17 +1,6 @@
 [INFO]: 🎯  Checking for the Wasm target...
 [INFO]: 🌀  Compiling to Wasm...
    Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
-warning: value assigned to `radius` is never read
-   --> crates/voxel/src/worldgen.rs:233:30
-    |
-233 |             let mut radius = 0i32;
-    |                              ^^^^ this value is reassigned later and never used
-...
-236 |                 radius = if level % 3 == 0 { 2 } else { 1 };
-    |                 ------------------------------------------- `radius` is overwritten here before the previous value is read
-    |
-    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
-
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
    |
@@ -24,12 +13,12 @@ warning: field `screen` is never read
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-warning: `voxel` (lib) generated 2 warnings
+warning: `voxel` (lib) generated 1 warning
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `release` profile [optimized] target(s) in 2.08s
+    Finished `release` profile [optimized] target(s) in 7.96s
 [INFO]: ⬇️  Installing wasm-bindgen...
 [INFO]: Optional field missing from Cargo.toml: 'repository'. This is not necessary, but recommended
 [INFO]: License key is set in Cargo.toml but no LICENSE file(s) were found; Please add the LICENSE file(s) to your project directory
-[INFO]: ✨   Done in 3.01s
+[INFO]: ✨   Done in 9.43s
 [INFO]: 📦   Your wasm pkg is ready to publish at web/pkg.
 [WARN]: ⚠️   There's a newer version of wasm-pack available, the new version is: 0.15.1, you are using: 0.13.1. To update, navigate to: https://rustwasm.github.io/wasm-pack/installer/
