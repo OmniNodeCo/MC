@@ -1,81 +1,155 @@
    Compiling wasm-bindgen-macro v0.2.130
     Checking voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
-    Checking ttf-parser v0.25.1
-    Checking xcursor v0.3.11
-   Compiling smithay-client-toolkit v0.18.1
-   Compiling zerocopy v0.8.63
-error[E0308]: mismatched types
-   --> crates/voxel/src/textures.rs:523:27
-    |
-523 |                 t.rect(x, y0, w.min(TILE_PX - 1 - x), 4, rgb(c));
-    |                   ----    ^^ expected `u32`, found `usize`
-    |                   |
-    |                   arguments to this method are incorrect
-    |
-note: method defined here
-   --> crates/voxel/src/textures.rs:162:8
-    |
-162 |     fn rect(&mut self, x: u32, y: u32, w: u32, h: u32, c: Rgba) {
-    |        ^^^^                    ------
-help: you can convert a `usize` to a `u32` and panic if the converted value doesn't fit
-    |
-523 |                 t.rect(x, y0.try_into().unwrap(), w.min(TILE_PX - 1 - x), 4, rgb(c));
-    |                             ++++++++++++++++++++
-
-error[E0689]: can't call method `abs` on ambiguous numeric type `{integer}`
-   --> crates/voxel/src/worldgen.rs:218:41
-    |
-216 |                 for dx in -r..=r {
-    |                     -- you must specify a type for this binding, like `i32`
-217 |                     for dz in -r..=r {
-218 |                         let corner = dx.abs() == r && dz.abs() == r;
-    |                                         ^^^
-
-error[E0689]: can't call method `abs` on ambiguous numeric type `{integer}`
-   --> crates/voxel/src/worldgen.rs:218:58
-    |
-217 |                     for dz in -r..=r {
-    |                         -- you must specify a type for this binding, like `i32`
-218 |                         let corner = dx.abs() == r && dz.abs() == r;
-    |                                                          ^^^
-
+    Checking x11rb-protocol v0.13.2
+    Checking as-raw-xcb-connection v1.0.1
+   Compiling winit v0.29.15
+    Checking ahash v0.8.12
+    Checking sctk-adwaita v0.8.3
     Checking wasm-bindgen v0.2.130
-warning: value assigned to `travelled` is never read
-   --> crates/voxel/src/raycast.rs:89:25
+warning: value assigned to `radius` is never read
+   --> crates/voxel/src/worldgen.rs:233:30
     |
- 89 |     let mut travelled = 0.0f32;
-    |                         ^^^^^^ this value is reassigned later and never used
+233 |             let mut radius = 0i32;
+    |                              ^^^^ this value is reassigned later and never used
 ...
-104 |         travelled = t_max[axis];
-    |         ----------------------- `travelled` is overwritten here before the previous value is read
+236 |                 radius = if level % 3 == 0 { 2 } else { 1 };
+    |                 ------------------------------------------- `radius` is overwritten here before the previous value is read
     |
     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
 
-error[E0507]: cannot move out of `game.player` which is behind a shared reference
-   --> crates/voxel/src/ui.rs:286:13
-    |
-286 |     let p = game.player;
-    |             ^^^^^^^^^^^ move occurs because `game.player` has type `physics::Player`, which does not implement the `Copy` trait
-    |
-help: consider borrowing here
-    |
-286 |     let p = &game.player;
-    |             +
-help: consider cloning the value if the performance cost is acceptable
-    |
-286 |     let p = game.player.clone();
-    |                        ++++++++
+warning: field `screen` is never read
+  --> crates/voxel/src/ui.rs:35:5
+   |
+33 | pub struct Ui {
+   |            -- field in this struct
+34 |     verts: Vec<UiVertex>,
+35 |     screen: [f32; 2],
+   |     ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-warning: unused variable: `cold`
-   --> crates/voxel/src/worldgen.rs:366:17
+warning: this function has too many arguments (8/7)
+   --> crates/voxel/src/chunk.rs:108:5
     |
-366 |             let cold = temps[i];
-    |                 ^^^^ help: if this is intentional, prefix it with an underscore: `_cold`
+108 |     pub fn fill(&mut self, x0: i32, y0: i32, z0: i32, w: i32, h: i32, d: i32, block: u8) {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     |
-    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+    = note: `#[warn(clippy::too_many_arguments)]` on by default
 
-Some errors have detailed explanations: E0308, E0507, E0689.
-For more information about an error, try `rustc --explain E0308`.
-warning: `voxel` (lib) generated 2 warnings
-error: could not compile `voxel` (lib) due to 4 previous errors; 2 warnings emitted
+    Checking x11-dl v2.21.0
+warning: this function has too many arguments (8/7)
+   --> crates/voxel/src/mesher.rs:163:1
+    |
+163 | / fn push_quad(
+164 | |     data: &mut MeshData,
+165 | |     world: &World,
+166 | |     block_pos: [i32; 3],
+...   |
+171 | |     use_ao: bool,
+172 | | ) {
+    | |_^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+warning: manual implementation of an assign operation
+  --> crates/voxel/src/particles.rs:76:17
+   |
+76 |                 p.vel = p.vel * 0.25;
+   |                 ^^^^^^^^^^^^^^^^^^^^ help: replace it with: `p.vel *= 0.25`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#assign_op_pattern
+   = note: `#[warn(clippy::assign_op_pattern)]` on by default
+
+warning: manual implementation of an assign operation
+  --> crates/voxel/src/particles.rs:81:13
+   |
+81 |             p.vel = p.vel * (1.0 - dt * 1.5);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: replace it with: `p.vel *= (1.0 - dt * 1.5)`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#assign_op_pattern
+
+warning: casting to the same type is unnecessary (`i32` -> `i32`)
+   --> crates/voxel/src/textures.rs:192:22
+    |
+192 |             let cx = rng.range(2, TILE_PX as i32 - 3) as i32;
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, TILE_PX as i32 - 3)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    = note: `#[warn(clippy::unnecessary_cast)]` on by default
+
+warning: casting to the same type is unnecessary (`i32` -> `i32`)
+   --> crates/voxel/src/textures.rs:193:22
+    |
+193 |             let cy = rng.range(2, TILE_PX as i32 - 3) as i32;
+    |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, TILE_PX as i32 - 3)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`u32` -> `u32`)
+   --> crates/voxel/src/textures.rs:257:30
+    |
+257 |                 let jitter = (crate::noise::hash2(9, cell_x, cell_y) % 3) as u32;
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(crate::noise::hash2(9, cell_x, cell_y) % 3)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`u32` -> `u32`)
+   --> crates/voxel/src/textures.rs:591:26
+    |
+591 |             let bx = 1 + (crate::noise::hash2(31, blade, 7) % 14) as u32;
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(crate::noise::hash2(31, blade, 7) % 14)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`u32` -> `u32`)
+   --> crates/voxel/src/textures.rs:592:30
+    |
+592 |             let height = 6 + (crate::noise::hash2(32, blade, 9) % 8) as u32;
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(crate::noise::hash2(32, blade, 9) % 8)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`u32` -> `u32`)
+   --> crates/voxel/src/textures.rs:746:25
+    |
+746 |         let lines = 2 + stage as u32;
+    |                         ^^^^^^^^^^^^ help: try: `stage`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`i32` -> `i32`)
+   --> crates/voxel/src/textures.rs:748:25
+    |
+748 |             let mut x = rng.range(2, 13) as i32;
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, 13)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`i32` -> `i32`)
+   --> crates/voxel/src/textures.rs:749:25
+    |
+749 |             let mut y = rng.range(2, 13) as i32;
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, 13)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: casting to the same type is unnecessary (`i32` -> `i32`)
+   --> crates/voxel/src/worldgen.rs:235:29
+    |
+235 |                 let level = (trunk_h - 1 - dy) as i32;
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(trunk_h - 1 - dy)`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+
+warning: `voxel` (lib) generated 15 warnings (run `cargo clippy --fix --lib -p voxel -- ` to apply 11 suggestions)
+    Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
+   --> crates/client/src/renderer.rs:177:74
+    |
+177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
+    |                                                                          ^^^^^^^^^^
+
+For more information about this error, try `rustc --explain E0689`.
+error: could not compile `mc-client` (lib) due to 1 previous error
 warning: build failed, waiting for other jobs to finish...
