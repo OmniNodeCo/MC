@@ -1,0 +1,13 @@
+[package]
+name = "mc-client"
+description = "wgpu renderer and platform agnostic game loop for the voxel game"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+voxel.workspace = true
+glam.workspace = true
+wgpu.workspace = true
+bytemuck.workspace = true

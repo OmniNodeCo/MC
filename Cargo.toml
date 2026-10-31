@@ -1,0 +1,39 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/voxel",
+    "crates/client",
+    "crates/desktop",
+    "crates/webapp",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["OmniNodeCo"]
+license = "MIT"
+
+[workspace.dependencies]
+voxel = { path = "crates/voxel" }
+mc-client = { path = "crates/client" }
+
+glam = "0.27"
+wgpu = "0.20.1"
+winit = "0.29.15"
+pollster = "0.3"
+bytemuck = { version = "1.16", features = ["derive"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+console_error_panic_hook = "0.1"
+web-sys = "0.3"
+
+# Release: keep the wasm download small and the frame time predictable.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[profile.dev.package."*"]
+opt-level = 1

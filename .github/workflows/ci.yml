@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [arena/da57a0d8-mc, main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  native:
+    name: native (linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Check
+        run: cargo check --workspace --all-targets
+      - name: Test
+        run: cargo test --workspace --no-fail-fast
+      - name: Build release binary
+        run: cargo build --release -p mc-desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mc-linux-x86_64
+          path: target/release/mc
+          if-no-files-found: error
+
+  wasm:
+    name: wasm (webgl2)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - name: Add wasm target
+        run: rustup target add wasm32-unknown-unknown
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      - name: Build wasm bundle
+        run: wasm-pack build crates/webapp --target web --release --out-dir ../../web/pkg --out-name mc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-pkg
+          path: web/pkg
+          if-no-files-found: error

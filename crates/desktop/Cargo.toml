@@ -1,0 +1,18 @@
+[package]
+name = "mc-desktop"
+description = "Native desktop build of the voxel game"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "mc"
+path = "src/main.rs"
+
+[dependencies]
+voxel.workspace = true
+mc-client.workspace = true
+wgpu.workspace = true
+winit.workspace = true
+pollster.workspace = true
