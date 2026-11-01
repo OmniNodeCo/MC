@@ -6,6 +6,7 @@ use glam::Vec3;
 use crate::block::{self, id};
 use crate::chunk::{chunk_of, ChunkPos, SEA_LEVEL};
 use crate::noise::{smoothstep, Rng};
+use crate::mob::{self, Mob, MobAction, MobKind};
 use crate::particles::Particles;
 use crate::physics::{self, Player};
 use crate::raycast::{self, RayHit};
@@ -17,6 +18,11 @@ pub const DAY_LENGTH: f32 = 900.0;
 /// How far the player can reach to break / place blocks.
 pub const REACH: f32 = 5.5;
 pub const HOTBAR_SLOTS: usize = 9;
+/// Minecraft's health / hunger scale: 20 points = 10 hearts.
+pub const MAX_HEALTH: f32 = 20.0;
+pub const MAX_HUNGER: f32 = 20.0;
+/// Reach used when punching an entity.
+pub const ATTACK_REACH: f32 = 3.2;
 
 const TAU: f32 = std::f32::consts::TAU;
 
@@ -124,6 +130,26 @@ pub struct Game {
     pub message: Option<(String, f32)>,
     pub swing: f32,
     pub screen: [f32; 2],
+
+    // ---- survival --------------------------------------------------------
+    pub health: f32,
+    pub hunger: f32,
+    /// Saturation absorbs hunger drain before the hunger bar moves.
+    pub saturation: f32,
+    pub dead: bool,
+    /// Red screen flash after taking damage, in seconds.
+    pub hurt_flash: f32,
+    pub damage_cooldown: f32,
+    pub fall_distance: f32,
+    pub drown_timer: f32,
+    pub regen_timer: f32,
+    pub starve_timer: f32,
+    pub kills: u32,
+
+    // ---- creatures -------------------------------------------------------
+    pub mobs: Vec<Mob>,
+    spawn_timer: f32,
+
     rng: Rng,
     biome_timer: f32,
     pub saved_flash: f32,
@@ -148,7 +174,7 @@ impl Game {
         Self {
             world,
             player,
-            mode: GameMode::Creative,
+            mode: GameMode::Survival,
             time: 0.12,
             hotbar: [
                 id::GRASS,
@@ -178,9 +204,22 @@ impl Game {
             meshed_chunks: 0,
             fps: 0.0,
             biome,
-            message: Some(("Press E for the block palette - G toggles survival".into(), 6.0)),
+            message: Some(("Survive the night - G switches game mode".into(), 6.0)),
             swing: 1.0,
             screen: [1280.0, 720.0],
+            health: MAX_HEALTH,
+            hunger: MAX_HUNGER,
+            saturation: 5.0,
+            dead: false,
+            hurt_flash: 0.0,
+            damage_cooldown: 0.0,
+            fall_distance: 0.0,
+            drown_timer: 0.0,
+            regen_timer: 0.0,
+            starve_timer: 0.0,
+            kills: 0,
+            mobs: Vec::new(),
+            spawn_timer: 1.0,
             rng: Rng::new(seed ^ 0xA5A5_1234),
             biome_timer: 0.0,
             saved_flash: 0.0,
@@ -297,13 +336,27 @@ impl Game {
             self.inventory_open = false;
         }
         if input.respawn {
-            self.respawn();
+            if self.dead {
+                self.respawn_after_death();
+            } else {
+                self.respawn();
+            }
         }
         if let Some(click) = input.click {
             self.handle_click(click);
         }
         if input.save {
             self.notify("Saving...");
+        }
+
+        self.hurt_flash = (self.hurt_flash - dt).max(0.0);
+        self.damage_cooldown = (self.damage_cooldown - dt).max(0.0);
+
+        if self.dead {
+            self.time = (self.time + dt / DAY_LENGTH).fract();
+            self.paused = !input.cursor_locked;
+            self.stream_chunks();
+            return;
         }
 
         self.paused = !input.cursor_locked;
@@ -321,9 +374,15 @@ impl Game {
                 .rotate(input.mouse_dx, input.mouse_dy, 0.0024);
         }
 
-        self.update_movement(dt, input);
+        let fall = self.update_movement(dt, input);
+        if fall > 0.0 && !self.player.in_water {
+            self.damage_player(fall, None);
+        }
         self.update_interaction(dt, input);
         self.particles.update(dt, &self.world);
+        self.update_survival(dt, input);
+        self.update_mobs(dt);
+        self.try_spawn_mobs(dt);
 
         // --- world state --------------------------------------------------
         self.time = (self.time + dt / DAY_LENGTH).fract();
@@ -349,6 +408,22 @@ impl Game {
         self.stream_chunks();
     }
 
+    pub fn respawn_after_death(&mut self) {
+        self.dead = false;
+        self.health = MAX_HEALTH;
+        self.hunger = MAX_HUNGER;
+        self.saturation = 5.0;
+        self.hurt_flash = 0.0;
+        self.damage_cooldown = 0.0;
+        self.fall_distance = 0.0;
+        self.drown_timer = 0.0;
+        self.regen_timer = 0.0;
+        self.starve_timer = 0.0;
+        self.break_progress = 0.0;
+        self.break_target = None;
+        self.respawn();
+    }
+
     fn respawn(&mut self) {
         let mut pos = self.player.spawn;
         let top = self.world.surface_height(
@@ -362,7 +437,7 @@ impl Game {
         self.notify("Respawned");
     }
 
-    fn update_movement(&mut self, dt: f32, input: &mut Input) {
+    fn update_movement(&mut self, dt: f32, input: &mut Input) -> f32 {
         let player = &mut self.player;
 
         let feet = player.pos + Vec3::new(0.0, 0.2, 0.0);
@@ -480,6 +555,18 @@ impl Game {
         }
 
         self.swing = (self.swing + dt * 3.5).min(1.0);
+
+        // ---- fall damage --------------------------------------------------
+        if player.on_ground {
+            let travelled = self.fall_distance;
+            self.fall_distance = 0.0;
+            if travelled > 3.6 {
+                return (travelled - 3.0).floor() * 0.5;
+            }
+        } else if player.vel.y < 0.0 {
+            self.fall_distance += -player.vel.y * dt;
+        }
+        0.0
     }
 
     fn update_interaction(&mut self, dt: f32, input: &mut Input) {
@@ -490,7 +577,27 @@ impl Game {
         }
 
         let eye = self.player.eye();
-        let hit = raycast::raycast(&self.world, eye, self.player.look_dir(), REACH);
+        let dir = self.player.look_dir();
+
+        // Punching a creature takes priority over breaking the block behind it.
+        if input.break_held && self.swing >= 1.0 {
+            if let Some((index, _)) = mob::raycast_mobs(&self.mobs, eye, dir, ATTACK_REACH) {
+                let damage = if self.mode == GameMode::Creative { 200.0 } else { 4.0 };
+                let name = self.mobs[index].kind.name();
+                let died = mob::damage(&mut self.mobs[index], damage, eye);
+                self.swing = 0.0;
+                self.break_progress = 0.0;
+                self.break_target = None;
+                if died {
+                    self.kills += 1;
+                    let text = format!("{name} defeated");
+                    self.notify(text);
+                }
+                return;
+            }
+        }
+
+        let hit = raycast::raycast(&self.world, eye, dir, REACH);
         self.target = hit;
 
         if input.pick {
@@ -605,6 +712,252 @@ impl Game {
     }
 
     // ---------------------------------------------------------------------
+    // Survival, damage and creatures
+    // ---------------------------------------------------------------------
+
+    /// Apply damage to the player, honouring gamemodes and invulnerability.
+    pub fn damage_player(&mut self, amount: f32, source: Option<Vec3>) {
+        if self.mode == GameMode::Creative || self.dead || amount <= 0.0 {
+            return;
+        }
+        if self.damage_cooldown > 0.0 {
+            return;
+        }
+        self.health = (self.health - amount).max(0.0);
+        self.hurt_flash = 0.45;
+        self.damage_cooldown = 0.45;
+        if let Some(src) = source {
+            let away = Vec3::new(self.player.pos.x - src.x, 0.0, self.player.pos.z - src.z)
+                .normalize_or_zero();
+            self.player.vel += away * 5.5;
+            self.player.vel.y = self.player.vel.y.max(4.4);
+        }
+        if self.health <= 0.0 {
+            self.dead = true;
+            self.health = 0.0;
+            self.break_progress = 0.0;
+            self.break_target = None;
+            self.notify("You died!");
+        }
+    }
+
+    pub fn heal(&mut self, amount: f32) {
+        self.health = (self.health + amount).min(MAX_HEALTH);
+    }
+
+    /// Hunger, regeneration, starvation and drowning.
+    fn update_survival(&mut self, dt: f32, input: &mut Input) {
+        if self.mode == GameMode::Creative {
+            self.health = MAX_HEALTH;
+            self.hunger = MAX_HUNGER;
+            self.saturation = 5.0;
+            return;
+        }
+
+        let moving = self.player.on_ground
+            && (input.forward || input.back || input.left || input.right);
+        let drain = if self.player.sprinting {
+            0.11
+        } else if moving {
+            0.045
+        } else {
+            0.012
+        };
+        let drain = drain * dt;
+        if self.saturation > 0.0 {
+            self.saturation = (self.saturation - drain).max(0.0);
+        } else {
+            self.hunger = (self.hunger - drain).max(0.0);
+        }
+
+        if self.hunger > 17.0 && self.health < MAX_HEALTH {
+            self.regen_timer += dt;
+            if self.regen_timer >= 3.0 {
+                self.regen_timer = 0.0;
+                self.heal(1.0);
+                self.hunger = (self.hunger - 0.6).max(0.0);
+            }
+        } else {
+            self.regen_timer = 0.0;
+        }
+
+        if self.hunger <= 0.0 {
+            self.starve_timer += dt;
+            if self.starve_timer >= 4.0 {
+                self.starve_timer = 0.0;
+                self.health = (self.health - 1.0).max(0.0);
+                self.hurt_flash = 0.3;
+                if self.health <= 0.0 {
+                    self.dead = true;
+                    self.notify("You starved!");
+                }
+            }
+        } else {
+            self.starve_timer = 0.0;
+        }
+
+        if self.player.head_in_water {
+            self.drown_timer += dt;
+            if self.drown_timer >= 12.0 {
+                self.drown_timer = 0.0;
+                self.damage_player(2.0, None);
+            }
+        } else {
+            self.drown_timer = 0.0;
+        }
+    }
+
+    /// Tick every creature: AI, physics, attacks and daylight burning.
+    fn update_mobs(&mut self, dt: f32) {
+        let player_pos = self.player.pos;
+        let player_alive = !self.dead;
+        let daylight = self.daylight();
+
+        for i in 0..self.mobs.len() {
+            if !self.mobs[i].alive {
+                continue;
+            }
+            let mut creature = self.mobs[i].clone();
+            let action = mob::think(
+                &self.world,
+                &mut creature,
+                player_pos,
+                player_alive,
+                daylight,
+                dt,
+                &mut self.rng,
+            );
+            let position = creature.pos;
+            let alive = creature.alive;
+            self.mobs[i] = creature;
+
+            match action {
+                MobAction::None => {}
+                MobAction::Attack(damage) => {
+                    self.damage_player(damage, Some(position));
+                }
+                MobAction::Explode => {
+                    self.explode(position);
+                    self.mobs[i].alive = false;
+                }
+            }
+            if !alive && self.mobs[i].alive {
+                self.mobs[i].alive = false;
+            }
+        }
+
+        let player = self.player.pos;
+        self.mobs
+            .retain(|m| m.alive && m.pos.distance(player) < 110.0);
+    }
+
+    /// A creeper went off: blow a crater and hurt everything nearby.
+    fn explode(&mut self, center: Vec3) {
+        let radius = 3.2f32;
+        let cx = center.x.floor() as i32;
+        let cy = center.y.floor() as i32;
+        let cz = center.z.floor() as i32;
+        for dy in -3..=3i32 {
+            for dz in -4..=4i32 {
+                for dx in -4..=4i32 {
+                    let dist = ((dx * dx + dy * dy + dz * dz) as f32).sqrt();
+                    if dist > radius {
+                        continue;
+                    }
+                    let (x, y, z) = (cx + dx, cy + dy, cz + dz);
+                    let existing = self.world.get(x, y, z);
+                    if existing == id::AIR || existing == id::BEDROCK {
+                        continue;
+                    }
+                    if dist > radius * 0.55 && self.rng.chance(0.5) {
+                        continue;
+                    }
+                    if self.world.set(x, y, z, id::AIR) {
+                        self.particles.spawn_break([x, y, z], existing, &mut self.rng);
+                    }
+                }
+            }
+        }
+        let distance = (self.player.pos - center).length();
+        if distance < 6.0 {
+            let damage = (16.0 * (1.0 - distance / 6.0)).max(2.0);
+            self.damage_cooldown = 0.0;
+            self.damage_player(damage, Some(center));
+        }
+        for creature in self.mobs.iter_mut() {
+            let d = (creature.pos - center).length();
+            if d < 6.0 {
+                let damage = 24.0 * (1.0 - d / 6.0);
+                mob::damage(creature, damage, center);
+            }
+        }
+    }
+
+    /// Try to populate the world around the player, Minecraft style: animals in
+    /// daylight on grass, monsters in the dark.
+    fn try_spawn_mobs(&mut self, dt: f32) {
+        self.spawn_timer -= dt;
+        if self.spawn_timer > 0.0 || self.mobs.len() >= mob::MAX_MOBS {
+            return;
+        }
+        self.spawn_timer = 1.5;
+
+        let daylight = self.daylight();
+        let night = daylight < 0.34;
+        let hostiles = self.mobs.iter().filter(|m| m.kind.is_hostile()).count();
+        let passives = self.mobs.len() - hostiles;
+
+        for _ in 0..4 {
+            let want_hostile = night && self.rng.chance(0.66);
+            if want_hostile && hostiles >= 22 {
+                continue;
+            }
+            if !want_hostile && passives >= 12 {
+                continue;
+            }
+            if !want_hostile && !self.rng.chance(0.35) {
+                continue;
+            }
+
+            let angle = self.rng.next_f32() * TAU;
+            let radius = 22.0 + self.rng.next_f32() * 26.0;
+            let x = self.player.pos.x + angle.cos() * radius;
+            let z = self.player.pos.z + angle.sin() * radius;
+            let (ix, iz) = (x.floor() as i32, z.floor() as i32);
+            let top = self.world.surface_height(ix, iz);
+            if top <= SEA_LEVEL {
+                continue;
+            }
+            let ground = self.world.get(ix, top, iz);
+            let y = top as f32 + 1.0;
+            if block::is_solid(self.world.get(ix, top + 1, iz))
+                || block::is_solid(self.world.get(ix, top + 2, iz))
+            {
+                continue;
+            }
+            if self.world.get(ix, top + 1, iz) == id::WATER {
+                continue;
+            }
+            let kind = if want_hostile {
+                MobKind::HOSTILE[self.rng.range(0, 3) as usize]
+            } else {
+                if ground != id::GRASS && ground != id::SNOW {
+                    continue;
+                }
+                MobKind::PASSIVE[self.rng.range(0, 3) as usize]
+            };
+            let mut creature = Mob::new(kind, Vec3::new(x, y, z), &mut self.rng);
+            creature.yaw = self.rng.next_f32() * TAU;
+            creature.target_yaw = creature.yaw;
+            self.mobs.push(creature);
+        }
+    }
+
+    pub fn mobs_alive(&self) -> usize {
+        self.mobs.len()
+    }
+
+    // ---------------------------------------------------------------------
     // Sky
     // ---------------------------------------------------------------------
 
@@ -695,6 +1048,7 @@ mod tests {
     #[test]
     fn creative_break_is_instant() {
         let mut g = game();
+        g.mode = GameMode::Creative;
         let x = g.player.pos.x.floor() as i32;
         let z = g.player.pos.z.floor() as i32;
         let y = g.player.pos.y.floor() as i32 - 1;
@@ -724,6 +1078,56 @@ mod tests {
         }
         let total: u32 = g.counts.iter().sum();
         assert!(total > 0, "expected some blocks in the inventory");
+    }
+
+    #[test]
+    fn mobs_fall_onto_the_ground() {
+        let mut g = game();
+        let mut rng = Rng::new(7);
+        let x = g.player.pos.x + 3.0;
+        let z = g.player.pos.z;
+        let start = g.player.pos.y + 8.0;
+        let pig = Mob::new(MobKind::Pig, Vec3::new(x, start, z), &mut rng);
+        g.mobs.push(pig);
+        let mut input = Input {
+            cursor_locked: true,
+            ..Default::default()
+        };
+        for _ in 0..180 {
+            g.update(1.0 / 60.0, &mut input);
+        }
+        let mob = &g.mobs[0];
+        assert!(
+            mob.pos.y < start - 0.5,
+            "mob did not fall (y {} from {})",
+            mob.pos.y,
+            start
+        );
+    }
+
+    #[test]
+    fn punching_a_mob_damages_it() {
+        let mut g = game();
+        let mut rng = Rng::new(3);
+        let eye = g.player.eye();
+        let dir = g.player.look_dir();
+        let spot = eye + dir * 2.0;
+        let mut zombie = Mob::new(MobKind::Zombie, Vec3::new(spot.x, spot.y - 1.6, spot.z), &mut rng);
+        zombie.yaw = 0.0;
+        let before = zombie.health;
+        g.mobs.push(zombie);
+        let mut input = Input {
+            cursor_locked: true,
+            break_held: true,
+            ..Default::default()
+        };
+        g.update(1.0 / 60.0, &mut input);
+        assert!(
+            g.mobs[0].health < before,
+            "zombie health {} should be below {}",
+            g.mobs[0].health,
+            before
+        );
     }
 
     #[test]

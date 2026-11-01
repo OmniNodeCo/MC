@@ -19,6 +19,7 @@ use crate::gfx::{Gfx, LineVertex, SceneUniform};
 
 const UI_VERTEX_CAPACITY: usize = 32_768;
 const PARTICLE_VERTEX_CAPACITY: usize = 8_192;
+const MOB_VERTEX_CAPACITY: usize = 40_960;
 const OUTLINE_VERTEX_CAPACITY: usize = 128;
 /// A cube always has six quads.
 const CUBE_INDICES: u32 = 36;
@@ -40,6 +41,7 @@ pub struct Renderer {
     chunks: HashMap<ChunkPos, ChunkGpu>,
     ui_buffer: wgpu::Buffer,
     particle_buffer: wgpu::Buffer,
+    mob_buffer: wgpu::Buffer,
     overlay_buffer: wgpu::Buffer,
     outline_buffer: wgpu::Buffer,
     cube_indices: wgpu::Buffer,
@@ -62,6 +64,13 @@ impl Renderer {
             device,
             "particles",
             PARTICLE_VERTEX_CAPACITY,
+            std::mem::size_of::<Vertex>(),
+            wgpu::BufferUsages::VERTEX,
+        );
+        let mob_buffer = create_dynamic_buffer(
+            device,
+            "mob-vertices",
+            MOB_VERTEX_CAPACITY,
             std::mem::size_of::<Vertex>(),
             wgpu::BufferUsages::VERTEX,
         );
@@ -91,6 +100,7 @@ impl Renderer {
             chunks: HashMap::new(),
             ui_buffer,
             particle_buffer,
+            mob_buffer,
             overlay_buffer,
             outline_buffer,
             cube_indices,
@@ -389,6 +399,17 @@ impl Renderer {
                 .write_buffer(&self.ui_buffer, 0, cast_slice(&ui_vertices[..ui_count]));
         }
 
+        // ---- mobs (opaque textured cuboids) ---------------------------------
+        let mob_vertices = voxel::mob::build_vertices(&game.mobs);
+        let mob_count = mob_vertices.len().min(MOB_VERTEX_CAPACITY);
+        if mob_count > 0 {
+            self.gfx.queue.write_buffer(
+                &self.mob_buffer,
+                0,
+                cast_slice(&mob_vertices[..mob_count]),
+            );
+        }
+
         // ---- draw ----------------------------------------------------------
         let clear = wgpu::Color {
             r: sky[0] as f64 * 0.55,
@@ -447,6 +468,14 @@ impl Renderer {
                 pass.draw_indexed(0..mesh.index_count, 0, 0..1);
                 draw_calls += 1;
                 triangles += mesh.index_count as usize / 3;
+            }
+
+            // mobs share the opaque terrain pipeline
+            if mob_count > 0 {
+                pass.set_vertex_buffer(0, self.mob_buffer.slice(..));
+                pass.draw(0..mob_count as u32, 0..1);
+                draw_calls += 1;
+                triangles += mob_count / 3;
             }
 
             // cutout terrain + crack overlay + particles

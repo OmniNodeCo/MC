@@ -168,6 +168,11 @@ pub fn build(game: &Game) -> Vec<UiVertex> {
     let s = ui.scale;
     let [sw, sh] = game.screen;
 
+    if game.dead {
+        draw_death(&mut ui, game, s);
+        return ui.finish();
+    }
+
     if game.paused {
         draw_pause(&mut ui, game, s);
         return ui.finish();
@@ -219,6 +224,17 @@ pub fn build(game: &Game) -> Vec<UiVertex> {
         ui.frame(r[0] - 2.0 * s, r[1] - 2.0 * s, r[2] + 4.0 * s, r[3] + 4.0 * s, 3.0 * s, ACCENT);
     }
 
+    // ---- hearts and hunger ----------------------------------------------
+    if game.mode == GameMode::Survival {
+        draw_status_bars(&mut ui, game, &slots, s);
+    }
+
+    // ---- damage flash ----------------------------------------------------
+    if game.hurt_flash > 0.0 {
+        let a = (game.hurt_flash / 0.45).clamp(0.0, 1.0) * 0.35;
+        ui.rect(0.0, 0.0, sw, sh, [0.65, 0.02, 0.02, a]);
+    }
+
     // ---- selected block name -------------------------------------------
     let selected = game.selected_block();
     if selected != block::id::AIR {
@@ -251,6 +267,74 @@ pub fn build(game: &Game) -> Vec<UiVertex> {
     }
 
     ui.finish()
+}
+
+fn draw_status_bars(ui: &mut Ui, game: &Game, slots: &[Rect], s: f32) {
+    let Some(hotbar) = slots.first() else { return };
+    let Some(last) = slots.last() else { return };
+    let icon = 9.0 * s;
+    let gap = 1.0 * s;
+    let y = hotbar[1] - icon - 3.0 * s;
+
+    // hearts, left to right
+    let mut x = hotbar[0];
+    for i in 0..10 {
+        let value = game.health - (i as f32) * 2.0;
+        let tile = if value >= 2.0 {
+            textures::tiles::HEART_FULL
+        } else if value >= 1.0 {
+            textures::tiles::HEART_HALF
+        } else {
+            textures::tiles::HEART_EMPTY
+        };
+        ui.tile(x, y, icon, icon, tile, WHITE);
+        x += icon + gap;
+    }
+
+    // hunger, right to left
+    let mut x = last[0] + last[2] - icon;
+    for i in 0..10 {
+        let value = game.hunger - (i as f32) * 2.0;
+        let tile = if value >= 2.0 {
+            textures::tiles::FOOD_FULL
+        } else if value >= 1.0 {
+            textures::tiles::FOOD_HALF
+        } else {
+            textures::tiles::FOOD_EMPTY
+        };
+        ui.tile(x, y, icon, icon, tile, WHITE);
+        x -= icon + gap;
+    }
+
+    if game.hunger < 3.0 {
+        let warning = if (game.player.walk_time * 2.0).sin() > 0.0 {
+            [1.0, 0.3, 0.3, 1.0]
+        } else {
+            WHITE
+        };
+        ui.text_centered(game.screen[0] * 0.5, y - 14.0 * s, s, warning, "STARVING");
+    }
+}
+
+fn draw_death(ui: &mut Ui, game: &Game, s: f32) {
+    let [sw, sh] = game.screen;
+    ui.rect(0.0, 0.0, sw, sh, [0.35, 0.02, 0.02, 0.55]);
+    ui.text_centered(sw * 0.5, sh * 0.32, 3.0 * s, WHITE, "YOU DIED!");
+    ui.text_centered(
+        sw * 0.5,
+        sh * 0.32 + 42.0 * s,
+        1.1 * s,
+        [0.92, 0.9, 0.86, 1.0],
+        &format!("{} MOBS DEFEATED", game.kills),
+    );
+    ui.text_centered(sw * 0.5, sh * 0.30 + 96.0 * s, 1.6 * s, ACCENT, "PRESS R TO RESPAWN");
+    ui.text_centered(
+        sw * 0.5,
+        sh * 0.30 + 130.0 * s,
+        s,
+        [0.86, 0.9, 0.98, 0.85],
+        "ESC RELEASES THE MOUSE",
+    );
 }
 
 fn draw_palette(ui: &mut Ui, game: &Game, s: f32) {
@@ -334,6 +418,16 @@ fn draw_debug(ui: &mut Ui, game: &Game, s: f32) {
             WHITE,
         ),
         (
+            format!(
+                "HEALTH {:.1}/20   HUNGER {:.1}/20   MOBS {}   KILLS {}",
+                game.health,
+                game.hunger,
+                game.mobs_alive(),
+                game.kills
+            ),
+            WHITE,
+        ),
+        (
             format!("SEED {}", game.world.seed()),
             [0.8, 0.85, 0.95, 1.0],
         ),
@@ -385,7 +479,7 @@ fn draw_pause(ui: &mut Ui, game: &Game, s: f32) {
         "CTRL SPRINT    F FLY (CREATIVE)    G GAME MODE",
         "LEFT CLICK BREAK    RIGHT CLICK PLACE    MIDDLE PICK",
         "1-9 / WHEEL HOTBAR    E BLOCK PALETTE",
-        "F3 DEBUG    ESC RELEASE MOUSE",
+        "LEFT CLICK HIT MOBS  -  F3 DEBUG  -  ESC RELEASE MOUSE",
     ];
     let mut y = sh * 0.56;
     for line in controls {

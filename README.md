@@ -51,15 +51,38 @@ web/        HTML/JS shell (pointer lock, autosave, frame loop)
   and the pixel font are painted in code at start-up.
 - Frustum culling, view-model hand animation, block outline and crack overlay.
 
+**Creatures & survival**
+- Eight mobs with their own models, skins, physics and AI: pigs, cows, sheep
+  and chickens wander and flee when hit; zombies chase and punch, skeletons
+  shoot from range, creepers hiss and blow craters in the terrain, spiders
+  scuttle fast and leap.
+- Minecraft style spawning: animals appear on grass in daylight, monsters in
+  the dark; undead burn in the sun; mobs despawn when you leave them behind.
+- Survival mode with 10 hearts, a hunger bar, saturation, natural
+  regeneration, starvation, drowning, fall damage, knockback, damage
+  cooldowns and a death / respawn screen.
+- Creative mode with flight, instant mining and unlimited blocks (`G`
+  switches).
+
 **Gameplay**
 - First-person movement with AABB collision, sprinting, sneaking, jumping,
   swimming, and creative flight.
 - Break progress driven by block hardness; survival mode collects blocks,
   creative mode is instant and infinite.
 - 9 slot hotbar, block palette (E), pick block (middle mouse), mouse wheel.
+- Punch mobs with the left mouse button; the hotbar row above shows hearts and
+  hunger in survival mode.
 - Day/night cycle with a clock, biome readout and an F3 debug overlay.
 - Block-break particles, and autosaving to disk (desktop) or `localStorage`
   (browser).
+
+## A note on textures
+
+No Mojang assets are used or redistributed here: the 512×512 atlas is painted
+procedurally in `crates/voxel/src/textures.rs` at start-up (16×16 pixel art per
+block, plus hand-drawn mob skins, hearts and hunger icons) to match the
+familiar vanilla look. Shipping the official texture files would mean
+redistributing Mojang's copyrighted artwork.
 
 ## Build status
 

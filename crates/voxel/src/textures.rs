@@ -55,6 +55,18 @@ pub mod tiles {
     /// Solid white tile, used for HUD rectangles.
     pub const WHITE: u32 = 36;
     pub const COUNT: u32 = 37;
+
+    // ---- HUD icons ------------------------------------------------------
+    pub const HEART_FULL: u32 = 37;
+    pub const HEART_HALF: u32 = 38;
+    pub const HEART_EMPTY: u32 = 39;
+    pub const FOOD_FULL: u32 = 40;
+    pub const FOOD_HALF: u32 = 41;
+    pub const FOOD_EMPTY: u32 = 42;
+
+    // ---- mob skins: 4 tiles per mob (body, face, limb, head side) --------
+    pub const MOB_BASE: u32 = 48;
+    pub const MOB_TILES: u32 = 4;
 }
 
 /// UV rectangle `[u0, v0, u1, v1]` of a tile, with a small inset so nearest
@@ -730,10 +742,256 @@ pub fn build_atlas() -> Vec<u8> {
         t.fill([255, 255, 255, 255]);
     }
 
+    paint_hud_icons(&mut atlas);
+    paint_mobs(&mut atlas);
+
     crate::font::paint_glyphs(&mut atlas);
     paint_destroy_stages(&mut atlas);
 
     atlas
+}
+
+// ---------------------------------------------------------------------------
+// HUD icons: Minecraft style hearts and hunger drumsticks
+// ---------------------------------------------------------------------------
+
+const HEART_ART: [&str; 9] = [
+    "..XXX.XXX..",
+    ".XXXXXXXXX.",
+    "XXXXXXXXXXX",
+    "XXXXXXXXXXX",
+    ".XXXXXXXXX.",
+    "..XXXXXXX..",
+    "...XXXXX...",
+    "....XXX....",
+    ".....X.....",
+];
+
+const FOOD_ART: [&str; 9] = [
+    "....OXXXXX",
+    "...OXXXXXX",
+    "...XXXXXXX",
+    "...XXXXXXX",
+    "...XXXXXX.",
+    "..OXXXX...",
+    ".OOO......",
+    "OO........",
+    "O.........",
+];
+
+fn paint_hud_icons(atlas: &mut [u8]) {
+    let red = [206, 38, 44];
+    let shine = [255, 148, 148];
+    let dark = [52, 50, 56];
+    for (tile, mode) in [
+        (tiles::HEART_FULL, 2u8),
+        (tiles::HEART_HALF, 1),
+        (tiles::HEART_EMPTY, 0),
+    ] {
+        let mut t = Tile::new(atlas, tile);
+        t.fill([0, 0, 0, 0]);
+        for (y, row) in HEART_ART.iter().enumerate() {
+            for (x, ch) in row.chars().enumerate() {
+                if ch != 'X' {
+                    continue;
+                }
+                let px = x as u32 + 2;
+                let py = y as u32 + 3;
+                let color = match mode {
+                    2 => {
+                        if y == 1 && (x == 2 || x == 3) {
+                            shine
+                        } else {
+                            red
+                        }
+                    }
+                    1 => {
+                        if px >= 9 {
+                            dark
+                        } else {
+                            red
+                        }
+                    }
+                    _ => dark,
+                };
+                t.put(px, py, rgb(color));
+            }
+        }
+    }
+
+    let meat = [176, 92, 44];
+    let meat_dark = [128, 62, 30];
+    let bone = [232, 226, 208];
+    for (tile, mode) in [
+        (tiles::FOOD_FULL, 2u8),
+        (tiles::FOOD_HALF, 1),
+        (tiles::FOOD_EMPTY, 0),
+    ] {
+        let mut t = Tile::new(atlas, tile);
+        t.fill([0, 0, 0, 0]);
+        for (y, row) in FOOD_ART.iter().enumerate() {
+            for (x, ch) in row.chars().enumerate() {
+                let px = x as u32 + 3;
+                let py = y as u32 + 3;
+                let color = match ch {
+                    'X' => {
+                        if mode == 0 {
+                            dark
+                        } else if mode == 1 && px >= 10 {
+                            dark
+                        } else if y > 4 {
+                            meat_dark
+                        } else {
+                            meat
+                        }
+                    }
+                    'O' => {
+                        if mode == 0 {
+                            dark
+                        } else {
+                            bone
+                        }
+                    }
+                    _ => continue,
+                };
+                t.put(px, py, rgb(color));
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Mob skins
+// ---------------------------------------------------------------------------
+
+fn paint_mobs(atlas: &mut [u8]) {
+    use tiles::{MOB_BASE, MOB_TILES};
+    for kind in 0..8u32 {
+        let base = MOB_BASE + kind * MOB_TILES;
+        for slot in 0..MOB_TILES {
+            let mut t = Tile::new(atlas, base + slot);
+            t.fill([0, 0, 0, 0]);
+        }
+        let mut rng = Rng::new(900 + kind);
+
+        let (body, body_noise, face, limb, side) = match kind {
+            0 => (
+                [238, 152, 152],
+                10.0,
+                [238, 152, 152],
+                [214, 128, 128],
+                [238, 152, 152],
+            ),
+            1 => ([228, 228, 224], 8.0, [228, 228, 224], [206, 206, 202], [228, 228, 224]),
+            2 => ([236, 232, 224], 9.0, [206, 176, 150], [216, 210, 200], [236, 232, 224]),
+            3 => ([246, 246, 240], 6.0, [246, 246, 240], [232, 196, 60], [246, 246, 240]),
+            4 => ([58, 92, 154], 8.0, [104, 148, 88], [96, 140, 82], [104, 148, 88]),
+            5 => ([206, 206, 198], 7.0, [214, 214, 206], [196, 196, 188], [214, 214, 206]),
+            6 => ([96, 168, 78], 10.0, [104, 176, 84], [78, 142, 64], [104, 176, 84]),
+            _ => ([46, 42, 40], 8.0, [54, 48, 44], [38, 34, 32], [52, 46, 42]),
+        };
+
+        {
+            let mut t = Tile::new(atlas, base);
+            t.noise_fill(body, body_noise, &mut rng);
+            if kind == 1 {
+                for _ in 0..5 {
+                    t.blobs(1, [28, 28, 28], 2, &mut rng);
+                }
+            }
+            if kind == 6 {
+                t.blobs(9, [62, 120, 52], 1, &mut rng);
+                t.blobs(6, [126, 196, 104], 1, &mut rng);
+            }
+            if kind == 7 {
+                t.speckles(30, [80, 70, 64], &mut rng);
+            }
+            if kind == 2 {
+                t.blobs(14, [250, 248, 244], 1, &mut rng);
+            }
+        }
+        {
+            let mut t = Tile::new(atlas, base + 2);
+            t.noise_fill(limb, body_noise * 0.7, &mut rng);
+        }
+        {
+            let mut t = Tile::new(atlas, base + 3);
+            t.noise_fill(side, body_noise * 0.8, &mut rng);
+        }
+
+        // Faces -----------------------------------------------------------------
+        let mut t = Tile::new(atlas, base + 1);
+        t.noise_fill(face, body_noise * 0.6, &mut rng);
+        let black = [24, 22, 26];
+        match kind {
+            0 => {
+                // pig: snout with nostrils
+                t.rect(4, 6, 8, 6, rgb([226, 128, 128]));
+                t.rect(5, 8, 2, 2, rgb([150, 66, 66]));
+                t.rect(9, 8, 2, 2, rgb([150, 66, 66]));
+                t.rect(3, 3, 2, 2, rgb(black));
+                t.rect(11, 3, 2, 2, rgb(black));
+            }
+            1 => {
+                // cow: muzzle and eyes
+                t.rect(3, 8, 10, 6, rgb([196, 158, 138]));
+                t.rect(5, 10, 2, 2, rgb([120, 86, 74]));
+                t.rect(9, 10, 2, 2, rgb([120, 86, 74]));
+                t.rect(3, 3, 3, 3, rgb(black));
+                t.rect(10, 3, 3, 3, rgb(black));
+            }
+            2 => {
+                // sheep
+                t.rect(4, 3, 2, 3, rgb(black));
+                t.rect(10, 3, 2, 3, rgb(black));
+                t.rect(6, 9, 4, 2, rgb([122, 96, 78]));
+                t.blobs(10, [250, 248, 244], 1, &mut rng);
+            }
+            3 => {
+                // chicken: beak and eyes
+                t.rect(6, 7, 4, 3, rgb([232, 158, 40]));
+                t.rect(4, 3, 2, 2, rgb(black));
+                t.rect(10, 3, 2, 2, rgb(black));
+            }
+            4 => {
+                // zombie: sunken eyes and a slack mouth
+                t.rect(3, 4, 4, 3, rgb([26, 34, 26]));
+                t.rect(9, 4, 4, 3, rgb([26, 34, 26]));
+                t.rect(4, 10, 8, 2, rgb([40, 52, 38]));
+                t.speckles(26, [78, 116, 66], &mut rng);
+            }
+            5 => {
+                // skeleton: hollow sockets and a grin
+                t.fill([224, 224, 214, 255]);
+                t.speckles(30, [196, 196, 186], &mut rng);
+                t.rect(3, 4, 4, 4, rgb(black));
+                t.rect(9, 4, 4, 4, rgb(black));
+                t.rect(6, 9, 4, 2, rgb(black));
+                for i in 0..5 {
+                    t.rect(3 + i * 2, 11, 1, 2, rgb([150, 150, 142]));
+                }
+            }
+            6 => {
+                // creeper: the classic face
+                t.rect(3, 4, 3, 3, rgb(black));
+                t.rect(10, 4, 3, 3, rgb(black));
+                t.rect(7, 7, 2, 4, rgb(black));
+                t.rect(4, 8, 3, 4, rgb(black));
+                t.rect(9, 8, 3, 4, rgb(black));
+                t.rect(4, 11, 2, 2, rgb(black));
+                t.rect(10, 11, 2, 2, rgb(black));
+            }
+            _ => {
+                // spider: four red eyes
+                let red = [196, 40, 34];
+                t.rect(4, 5, 3, 3, rgb(red));
+                t.rect(9, 5, 3, 3, rgb(red));
+                t.rect(6, 9, 2, 2, rgb(red));
+                t.rect(9, 9, 2, 2, rgb(red));
+                t.speckles(24, [70, 62, 58], &mut rng);
+            }
+        }
+    }
 }
 
 /// Ten crack overlays that get darker and denser as a block breaks.

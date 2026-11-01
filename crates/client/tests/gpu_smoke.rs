@@ -14,7 +14,10 @@
 use std::collections::HashSet;
 use std::path::Path;
 
+use glam::Vec3;
 use mc_client::{Gfx, Renderer};
+use voxel::mob::{Mob, MobKind};
+use voxel::noise::Rng;
 use voxel::Game;
 
 const WIDTH: u32 = 1280;
@@ -59,6 +62,40 @@ fn renders_a_world_frame_offscreen() {
     game.paused = false;
     game.time = 0.30; // mid morning
     game.player.pitch = -0.22;
+
+    // Line the local wildlife up in front of the camera so the screenshot shows
+    // what the mob renderer produces.
+    {
+        let eye = game.player.pos;
+        let look = game.player.look_dir();
+        let right = if look.cross(Vec3::Y).length_squared() < 1e-4 {
+            Vec3::X
+        } else {
+            look.cross(Vec3::Y).normalize()
+        };
+        const LINEUP: [(MobKind, f32, f32); 8] = [
+            (MobKind::Pig, 3.6, -2.3),
+            (MobKind::Cow, 5.0, -1.3),
+            (MobKind::Sheep, 3.4, -0.4),
+            (MobKind::Chicken, 2.6, 0.5),
+            (MobKind::Zombie, 6.2, 1.5),
+            (MobKind::Skeleton, 7.4, 2.5),
+            (MobKind::Creeper, 4.4, 3.3),
+            (MobKind::Spider, 6.0, -3.4),
+        ];
+        for (i, (kind, ahead, side)) in LINEUP.iter().enumerate() {
+            let spot = eye + look * *ahead + right * *side;
+            let x = spot.x.floor() as i32;
+            let z = spot.z.floor() as i32;
+            let y = game.world.surface_height(x, z) as f32 + 1.0;
+            let mut rng = Rng::new(31 + i as u32);
+            let mut creature = Mob::new(*kind, Vec3::new(spot.x, y, spot.z), &mut rng);
+            // Face the camera.
+            creature.yaw = (-look.x).atan2(-look.z);
+            creature.target_yaw = creature.yaw;
+            game.mobs.push(creature);
+        }
+    }
 
     // Several frames so the chunk streamer can generate, mesh and upload the
     // world around the player.
@@ -150,6 +187,7 @@ fn renders_a_world_frame_offscreen() {
         sky_pixels > total / 100,
         "expected sky to cover part of the frame, got {sky_pixels} pixels"
     );
+    assert_eq!(game.mobs.len(), 8, "mob lineup was not added");
     assert!(
         game.triangles_drawn > 500,
         "expected terrain geometry, drew {} triangles",
