@@ -87,7 +87,10 @@ fn renders_a_world_frame_offscreen() {
             let spot = eye + look * *ahead + right * *side;
             let x = spot.x.floor() as i32;
             let z = spot.z.floor() as i32;
-            let y = game.world.surface_height(x, z) as f32 + 1.0;
+            let mut y = game.player.pos.y;
+            while y < game.player.pos.y + 5.0 && game.world.is_solid(x, y.floor() as i32, z) {
+                y += 1.0;
+            }
             let mut rng = Rng::new(31 + i as u32);
             let mut creature = Mob::new(*kind, Vec3::new(spot.x, y, spot.z), &mut rng);
             // Face the camera.
@@ -158,13 +161,20 @@ fn renders_a_world_frame_offscreen() {
     let total = (WIDTH * HEIGHT) as usize;
     let mid = (total / 2) * 4;
     println!(
-        "rendered {WIDTH}x{HEIGHT}: {} colour buckets, sky {:.1}%, centre pixel {:?}, \
+        "rendered {WIDTH}x{HEIGHT} with {} mobs: {} colour buckets, sky {:.1}%, centre pixel {:?}, \
          draws {}, tris {}",
+        game.mobs.len(),
         buckets.len(),
         100.0 * sky_pixels as f32 / total as f32,
         &pixels[mid..mid + 3],
         game.draw_calls,
         game.triangles_drawn
+    );
+
+    println!(
+        "mob geometry: {} vertices for {} mobs",
+        voxel::mob::build_vertices(&game.mobs).len(),
+        game.mobs.len()
     );
 
     // Save a genuine screenshot of the frame for humans to look at.

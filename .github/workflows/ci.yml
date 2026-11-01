@@ -12,12 +12,14 @@ env:
   CARGO_TERM_COLOR: never
 
 jobs:
-  native:
-    name: native (linux)
+  build:
+    name: build and test
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: Swatinem/rust-cache@v2
       - name: Install software Vulkan driver
         run: |
@@ -27,10 +29,11 @@ jobs:
       - name: Check
         run: |
           mkdir -p ci
+          echo "${{ github.run_id }} ${{ github.sha }}" > ci/run-id.txt
           set +e
           cargo check --workspace --all-targets > ci/check.log 2>&1
           echo $? > ci/check.status
-          cargo clippy --workspace --all-targets > ci/clippy.log 2>&1
+          cargo clippy --workspace --all-targets > ci/clippy.log 2>&1 || true
           set -e
       - name: Test
         run: |
@@ -46,123 +49,42 @@ jobs:
           cargo build --release -p mc-desktop > ci/build.log 2>&1
           echo $? > ci/build.status
           set -e
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: native-logs
-          path: ci/
-          if-no-files-found: warn
-      - name: Fail when anything failed
-        run: |
-          for f in ci/check.status ci/test.status ci/build.status; do
-            if [ -f "$f" ] && [ "$(cat $f)" != "0" ]; then
-              echo "== $f =="
-              cat "$f"
-              exit 1
-            fi
-          done
-
-  wasm:
-    name: wasm (webgl2)
-    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - name: Add wasm target
-        run: rustup target add wasm32-unknown-unknown
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
       - name: Build wasm bundle
         run: |
-          mkdir -p ci
           set +e
+          rustup target add wasm32-unknown-unknown > ci/wasm.log 2>&1
+          curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh >> ci/wasm.log 2>&1
           wasm-pack build crates/webapp --target web --release \
-            --out-dir ../../web/pkg --out-name mc > ci/wasm.log 2>&1
+            --out-dir ../../web/pkg --out-name mc >> ci/wasm.log 2>&1
           echo $? > ci/wasm.status
           set -e
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: wasm-logs
-          path: ci/
-          if-no-files-found: warn
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: web-pkg
-          path: web/pkg
-          if-no-files-found: warn
-      - name: Fail when the wasm build failed
-        run: |
-          if [ -f ci/wasm.status ] && [ "$(cat ci/wasm.status)" != "0" ]; then
-            exit 1
-          fi
-
-  # Artifact downloads are blocked for the agent sandbox, and job logs are not
-  # reachable either, so build output is committed back to the branch where it
-  # can simply be pulled.
-  publish:
-    name: publish build output
-    needs: [native, wasm]
-    if: ${{ always() && !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: native-logs
-          path: /tmp/art-native
-      - uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: wasm-logs
-          path: /tmp/art-wasm
-      - uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: web-pkg
-          path: /tmp/art-pkg
-      - name: Publish
+      - name: Summarise and publish
         run: |
           set -e
-          mkdir -p ci web/pkg
-          echo "--- downloaded artifacts ---"
-          find /tmp/art-native /tmp/art-wasm /tmp/art-pkg -type f 2>/dev/null | head -40 || true
-          for f in $(find /tmp/art-native /tmp/art-wasm -type f 2>/dev/null); do
-            cp -f "$f" "ci/$(basename "$f")"
-          done
-          for f in $(find /tmp/art-pkg -type f 2>/dev/null); do
-            cp -f "$f" "web/pkg/$(basename "$f")"
-          done
-          ls -la ci web/pkg
-          {
-            echo "run ${{ github.run_id }} $(date -u)"
-            echo "--- artifact files ---"
-            find /tmp/art-native /tmp/art-wasm /tmp/art-pkg -type f 2>/dev/null | head -40
-            echo "--- git status before add ---"
-            git status --porcelain | head -20
-          } > ci/publish.log
           {
             echo "run: ${{ github.run_id }} $(date -u)"
+            echo "commit: ${{ github.sha }}"
             echo "native check: $(cat ci/check.status 2>/dev/null || echo missing)"
             echo "native test:  $(cat ci/test.status 2>/dev/null || echo missing)"
             echo "native build: $(cat ci/build.status 2>/dev/null || echo missing)"
             echo "wasm build:   $(cat ci/wasm.status 2>/dev/null || echo missing)"
             echo
+            echo "===== gpu smoke test ====="
+            grep -E "rendered |wrote |no GPU adapter" ci/test.log | tail -5 || true
+            echo
             for f in check test build wasm; do
-              if [ -f "ci/$f.log" ]; then
-                echo "===== $f.log (tail) ====="
-                grep -E "^(error|warning: unused|   -->|error\[)" -A 2 "ci/$f.log" | head -60
+              if [ -f "ci/$f.log" ] && [ "$(cat ci/$f.status 2>/dev/null)" != "0" ]; then
+                echo "===== $f.log (errors) ====="
+                grep -E "^(error|error\\[)" -A 4 "ci/$f.log" | head -70 || true
                 echo "----- last lines -----"
-                tail -n 15 "ci/$f.log"
+                tail -n 20 "ci/$f.log" || true
               fi
             done
+            echo
+            echo "===== test summary ====="
+            grep -E "^test result" ci/test.log | tail -8 || true
           } > ci/summary.txt
-          head -60 ci/summary.txt
+          head -80 ci/summary.txt
 
           git config user.name "mc-ci"
           git config user.email "ci@omninode.dev"
@@ -170,8 +92,6 @@ jobs:
           if [ -d web/pkg ]; then
             git add -f web/pkg
           fi
-          echo "--- staged ---"
-          git diff --cached --name-only | head -30
           if git diff --cached --quiet; then
             echo "nothing to publish"
             exit 0
@@ -184,3 +104,12 @@ jobs:
             git pull --rebase origin ${{ github.ref_name }} || true
           done
           exit 1
+      - name: Fail when anything failed
+        run: |
+          for f in ci/check.status ci/test.status ci/build.status ci/wasm.status; do
+            if [ -f "$f" ] && [ "$(cat $f)" != "0" ]; then
+              echo "== $f =="
+              cat "$f"
+              exit 1
+            fi
+          done
