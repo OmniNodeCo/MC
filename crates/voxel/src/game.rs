@@ -4,7 +4,7 @@
 use glam::Vec3;
 
 use crate::block::{self, id};
-use crate::chunk::{chunk_of, ChunkPos, SEA_LEVEL};
+use crate::chunk::{chunk_of, ChunkPos, CHUNK_Y, SEA_LEVEL};
 use crate::noise::{smoothstep, Rng};
 use crate::mob::{self, Mob, MobAction, MobKind};
 use crate::particles::Particles;
@@ -920,16 +920,18 @@ impl Game {
             }
 
             let angle = self.rng.next_f32() * TAU;
-            let radius = 22.0 + self.rng.next_f32() * 26.0;
+            let radius = 16.0 + self.rng.next_f32() * 18.0;
             let x = self.player.pos.x + angle.cos() * radius;
             let z = self.player.pos.z + angle.sin() * radius;
             let (ix, iz) = (x.floor() as i32, z.floor() as i32);
+            if !self.world.is_loaded(chunk_of(ix, iz)) {
+                continue;
+            }
             let top = self.world.surface_height(ix, iz);
-            if top <= SEA_LEVEL {
+            if top <= SEA_LEVEL || top >= crate::chunk::CHUNK_Y as i32 - 3 {
                 continue;
             }
             let ground = self.world.get(ix, top, iz);
-            let y = top as f32 + 1.0;
             if block::is_solid(self.world.get(ix, top + 1, iz))
                 || block::is_solid(self.world.get(ix, top + 2, iz))
             {
@@ -946,11 +948,31 @@ impl Game {
                 }
                 MobKind::PASSIVE[self.rng.range(0, 3) as usize]
             };
-            let mut creature = Mob::new(kind, Vec3::new(x, y, z), &mut self.rng);
-            creature.yaw = self.rng.next_f32() * TAU;
-            creature.target_yaw = creature.yaw;
-            self.mobs.push(creature);
+            self.spawn_creature(kind, ix, iz);
         }
+    }
+
+    /// Place a creature on the surface of the column `(wx, wz)`.
+    pub fn spawn_creature(&mut self, kind: MobKind, wx: i32, wz: i32) -> bool {
+        if !self.world.is_loaded(chunk_of(wx, wz)) {
+            return false;
+        }
+        let top = self.world.surface_height(wx, wz);
+        if top <= SEA_LEVEL || top >= CHUNK_Y as i32 - 3 {
+            return false;
+        }
+        if self.world.is_liquid(wx, top + 1, wz) {
+            return false;
+        }
+        let mut creature = Mob::new(
+            kind,
+            Vec3::new(wx as f32 + 0.5, top as f32 + 1.0, wz as f32 + 0.5),
+            &mut self.rng,
+        );
+        creature.yaw = self.rng.next_f32() * TAU;
+        creature.target_yaw = creature.yaw;
+        self.mobs.push(creature);
+        true
     }
 
     pub fn mobs_alive(&self) -> usize {
@@ -1128,6 +1150,90 @@ mod tests {
             g.mobs[0].health,
             before
         );
+    }
+
+    #[test]
+    fn spawning_places_a_creature_on_the_ground() {
+        let mut g = game();
+        let x = g.player.pos.x.floor() as i32 + 3;
+        let z = g.player.pos.z.floor() as i32;
+        if !g.spawn_creature(MobKind::Pig, x, z) {
+            return; // ocean column, nothing to assert
+        }
+        let mob = g.mobs.last().expect("creature pushed").clone();
+        assert_eq!(mob.kind, MobKind::Pig);
+        let below = mob.pos.y.floor() as i32 - 1;
+        assert!(
+            g.world.is_solid(x, below, z),
+            "creature should stand on solid ground"
+        );
+        assert_eq!(mob.health, MobKind::Pig.max_health());
+    }
+
+    #[test]
+    fn zombies_hunt_the_player() {
+        let mut g = game();
+        g.time = 0.75;
+        let x = g.player.pos.x.floor() as i32 + 3;
+        let z = g.player.pos.z.floor() as i32;
+        if !g.spawn_creature(MobKind::Zombie, x, z) {
+            return;
+        }
+        let mut input = Input {
+            cursor_locked: true,
+            ..Default::default()
+        };
+        for _ in 0..360 {
+            g.time = 0.75;
+            g.update(1.0 / 60.0, &mut input);
+        }
+        assert!(
+            g.health < MAX_HEALTH,
+            "the zombie should have reached and hit the player (health {})",
+            g.health
+        );
+    }
+
+    #[test]
+    fn damage_kills_and_respawn_heals() {
+        let mut g = game();
+        g.damage_cooldown = 0.0;
+        g.damage_player(8.0, None);
+        assert!(g.health < MAX_HEALTH);
+        assert!(!g.dead);
+        g.damage_cooldown = 0.0;
+        g.damage_player(100.0, None);
+        assert!(g.dead, "player should be dead");
+        g.respawn_after_death();
+        assert!(!g.dead);
+        assert_eq!(g.health, MAX_HEALTH);
+    }
+
+    #[test]
+    fn creative_players_take_no_damage() {
+        let mut g = game();
+        g.mode = GameMode::Creative;
+        g.damage_cooldown = 0.0;
+        g.damage_player(50.0, None);
+        assert_eq!(g.health, MAX_HEALTH);
+        assert!(!g.dead);
+    }
+
+    #[test]
+    fn hunger_drains_while_sprinting() {
+        let mut g = game();
+        g.saturation = 0.0;
+        let before = g.hunger;
+        let mut input = Input {
+            cursor_locked: true,
+            forward: true,
+            sprint: true,
+            ..Default::default()
+        };
+        for _ in 0..120 {
+            g.update(1.0 / 60.0, &mut input);
+        }
+        assert!(g.hunger < before, "hunger should drain, {} -> {}", before, g.hunger);
     }
 
     #[test]

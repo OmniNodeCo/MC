@@ -12,8 +12,8 @@ compiled to WebAssembly, rendering through WebGL2).
 
 *An unmodified frame of the renderer, captured by the automated GPU test
 (`crates/client/tests/gpu_smoke.rs`) on a software Vulkan driver — terrain,
-beach, ocean, a birch trunk, a tree canopy, a cactus and the HUD, all drawn by
-the code in this repository.*
+beach, ocean, a birch trunk, a tree canopy, a cactus, a pig, a cow, a sheep,
+hearts, hunger and the hotbar, all drawn by the code in this repository.*
 
 ```
 crates/
@@ -70,8 +70,8 @@ web/        HTML/JS shell (pointer lock, autosave, frame loop)
 - Break progress driven by block hardness; survival mode collects blocks,
   creative mode is instant and infinite.
 - 9 slot hotbar, block palette (E), pick block (middle mouse), mouse wheel.
-- Punch mobs with the left mouse button; the hotbar row above shows hearts and
-  hunger in survival mode.
+- Punch mobs with the left mouse button; hearts and hunger sit above the
+  hotbar in survival mode. `R` respawns after death.
 - Day/night cycle with a clock, biome readout and an F3 debug overlay.
 - Block-break particles, and autosaving to disk (desktop) or `localStorage`
   (browser).

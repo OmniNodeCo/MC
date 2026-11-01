@@ -94,7 +94,7 @@ fn renders_a_world_frame_offscreen() {
             let mut rng = Rng::new(31 + i as u32);
             let mut creature = Mob::new(*kind, Vec3::new(spot.x, y, spot.z), &mut rng);
             // Face the camera.
-            creature.yaw = (-look.x).atan2(-look.z);
+            creature.yaw = (-look.x).atan2(-look.z) + 0.3;
             creature.target_yaw = creature.yaw;
             game.mobs.push(creature);
         }
