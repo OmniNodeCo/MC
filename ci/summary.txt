@@ -1,74 +1,21 @@
-run: 41332388919 Sun Nov  1 17:38:37 UTC 2026
+run: 41332908176 Sun Nov  1 17:50:15 UTC 2026
+commit: 1916cda47b5b62797a98753f2e41660224ef509c
 native check: 0
 native test:  0
 native build: 0
 wasm build:   0
 
-===== check.log (tail) =====
------ last lines -----
-   |
-33 | pub struct Ui {
-   |            -- field in this struct
-34 |     verts: Vec<UiVertex>,
-35 |     screen: [f32; 2],
-   |     ^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-warning: `voxel` (lib test) generated 1 warning
-warning: `voxel` (lib) generated 1 warning (1 duplicate)
-    Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-    Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
-    Checking mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.60s
-===== test.log (tail) =====
------ last lines -----
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-warning: `voxel` (lib) generated 1 warning
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.81s
-     Running tests/gpu_smoke.rs (target/debug/deps/gpu_smoke-69a37505b3ef8983)
-
-running 1 test
-rendered 1280x720: 258 colour buckets, sky 38.7%, centre pixel [60, 80, 109], draws 16, tris 32248
+===== gpu smoke test =====
+rendered 1280x720 with 8 mobs: 315 colour buckets, sky 32.1%, centre pixel [60, 80, 109], draws 17, tris 32872
 wrote /home/runner/work/MC/MC/crates/client/../../ci/frame.png
-test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.16s
 
-===== build.log (tail) =====
------ last lines -----
-warning: field `screen` is never read
-  --> crates/voxel/src/ui.rs:35:5
-   |
-33 | pub struct Ui {
-   |            -- field in this struct
-34 |     verts: Vec<UiVertex>,
-35 |     screen: [f32; 2],
-   |     ^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-warning: `voxel` (lib) generated 1 warning
-   Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
-    Finished `release` profile [optimized] target(s) in 17.99s
-===== wasm.log (tail) =====
------ last lines -----
-35 |     screen: [f32; 2],
-   |     ^^^^^^
-   |
-   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
-
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-warning: `voxel` (lib) generated 1 warning
-   Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `release` profile [optimized] target(s) in 2.93s
-[INFO]: ⬇️  Installing wasm-bindgen...
-[INFO]: Optional field missing from Cargo.toml: 'repository'. This is not necessary, but recommended
-[INFO]: License key is set in Cargo.toml but no LICENSE file(s) were found; Please add the LICENSE file(s) to your project directory
-[INFO]: ✨   Done in 4.10s
-[INFO]: 📦   Your wasm pkg is ready to publish at web/pkg.
-[WARN]: ⚠️   There's a newer version of wasm-pack available, the new version is: 0.15.1, you are using: 0.13.1. To update, navigate to: https://rustwasm.github.io/wasm-pack/installer/
+===== test summary =====
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.56s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.92s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.07s

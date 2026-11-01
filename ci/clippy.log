@@ -1,22 +1,4 @@
-   Compiling wasm-bindgen-macro v0.2.130
     Checking voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
-    Checking x11rb-protocol v0.13.2
-    Checking as-raw-xcb-connection v1.0.1
-   Compiling winit v0.29.15
-    Checking ahash v0.8.12
-    Checking sctk-adwaita v0.8.3
-    Checking wasm-bindgen v0.2.130
-warning: value assigned to `radius` is never read
-   --> crates/voxel/src/worldgen.rs:233:30
-    |
-233 |             let mut radius = 0i32;
-    |                              ^^^^ this value is reassigned later and never used
-...
-236 |                 radius = if level % 3 == 0 { 2 } else { 1 };
-    |                 ------------------------------------------- `radius` is overwritten here before the previous value is read
-    |
-    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
-
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
    |
@@ -37,7 +19,19 @@ warning: this function has too many arguments (8/7)
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
     = note: `#[warn(clippy::too_many_arguments)]` on by default
 
-    Checking x11-dl v2.21.0
+warning: items after a test module
+   --> crates/voxel/src/mesher.rs:328:1
+    |
+328 | mod tests {
+    | ^^^^^^^^^
+...
+375 | pub fn tile_cube(tile: u32, inflate: f32) -> MeshData {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `#[warn(clippy::items_after_test_module)]` on by default
+    = help: move the items to before the test module was defined
+
 warning: this function has too many arguments (8/7)
    --> crates/voxel/src/mesher.rs:163:1
     |
@@ -70,86 +64,153 @@ warning: manual implementation of an assign operation
    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#assign_op_pattern
 
 warning: casting to the same type is unnecessary (`i32` -> `i32`)
-   --> crates/voxel/src/textures.rs:192:22
+   --> crates/voxel/src/textures.rs:204:22
     |
-192 |             let cx = rng.range(2, TILE_PX as i32 - 3) as i32;
+204 |             let cx = rng.range(2, TILE_PX as i32 - 3) as i32;
     |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, TILE_PX as i32 - 3)`
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
     = note: `#[warn(clippy::unnecessary_cast)]` on by default
 
 warning: casting to the same type is unnecessary (`i32` -> `i32`)
-   --> crates/voxel/src/textures.rs:193:22
+   --> crates/voxel/src/textures.rs:205:22
     |
-193 |             let cy = rng.range(2, TILE_PX as i32 - 3) as i32;
+205 |             let cy = rng.range(2, TILE_PX as i32 - 3) as i32;
     |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, TILE_PX as i32 - 3)`
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
 warning: casting to the same type is unnecessary (`u32` -> `u32`)
-   --> crates/voxel/src/textures.rs:257:30
+   --> crates/voxel/src/textures.rs:269:30
     |
-257 |                 let jitter = (crate::noise::hash2(9, cell_x, cell_y) % 3) as u32;
+269 |                 let jitter = (crate::noise::hash2(9, cell_x, cell_y) % 3) as u32;
     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(crate::noise::hash2(9, cell_x, cell_y) % 3)`
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
 warning: casting to the same type is unnecessary (`u32` -> `u32`)
-   --> crates/voxel/src/textures.rs:591:26
+   --> crates/voxel/src/textures.rs:603:26
     |
-591 |             let bx = 1 + (crate::noise::hash2(31, blade, 7) % 14) as u32;
+603 |             let bx = 1 + (crate::noise::hash2(31, blade, 7) % 14) as u32;
     |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(crate::noise::hash2(31, blade, 7) % 14)`
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
 warning: casting to the same type is unnecessary (`u32` -> `u32`)
-   --> crates/voxel/src/textures.rs:592:30
+   --> crates/voxel/src/textures.rs:604:30
     |
-592 |             let height = 6 + (crate::noise::hash2(32, blade, 9) % 8) as u32;
+604 |             let height = 6 + (crate::noise::hash2(32, blade, 9) % 8) as u32;
     |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(crate::noise::hash2(32, blade, 9) % 8)`
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
+warning: this `if` has identical blocks
+   --> crates/voxel/src/textures.rs:838:38
+    |
+838 |                           if mode == 0 {
+    |  ______________________________________^
+839 | |                             dark
+840 | |                         } else if mode == 1 && px >= 10 {
+    | |_________________________^
+    |
+note: same as this
+   --> crates/voxel/src/textures.rs:840:57
+    |
+840 |                           } else if mode == 1 && px >= 10 {
+    |  _________________________________________________________^
+841 | |                             dark
+842 | |                         } else if y > 4 {
+    | |_________________________^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#if_same_then_else
+    = note: `#[warn(clippy::if_same_then_else)]` on by default
+
 warning: casting to the same type is unnecessary (`u32` -> `u32`)
-   --> crates/voxel/src/textures.rs:746:25
-    |
-746 |         let lines = 2 + stage as u32;
-    |                         ^^^^^^^^^^^^ help: try: `stage`
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    --> crates/voxel/src/textures.rs:1004:25
+     |
+1004 |         let lines = 2 + stage as u32;
+     |                         ^^^^^^^^^^^^ help: try: `stage`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
 warning: casting to the same type is unnecessary (`i32` -> `i32`)
-   --> crates/voxel/src/textures.rs:748:25
-    |
-748 |             let mut x = rng.range(2, 13) as i32;
-    |                         ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, 13)`
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    --> crates/voxel/src/textures.rs:1006:25
+     |
+1006 |             let mut x = rng.range(2, 13) as i32;
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, 13)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
 warning: casting to the same type is unnecessary (`i32` -> `i32`)
-   --> crates/voxel/src/textures.rs:749:25
-    |
-749 |             let mut y = rng.range(2, 13) as i32;
-    |                         ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, 13)`
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    --> crates/voxel/src/textures.rs:1007:25
+     |
+1007 |             let mut y = rng.range(2, 13) as i32;
+     |                         ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `rng.range(2, 13)`
+     |
+     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
 warning: casting to the same type is unnecessary (`i32` -> `i32`)
-   --> crates/voxel/src/worldgen.rs:235:29
+   --> crates/voxel/src/worldgen.rs:234:29
     |
-235 |                 let level = (trunk_h - 1 - dy) as i32;
+234 |                 let level = (trunk_h - 1 - dy) as i32;
     |                             ^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `(trunk_h - 1 - dy)`
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
-warning: `voxel` (lib) generated 15 warnings (run `cargo clippy --fix --lib -p voxel -- ` to apply 11 suggestions)
+warning: `voxel` (lib) generated 15 warnings (7 duplicates) (run `cargo clippy --fix --lib -p voxel -- ` to apply 7 suggestions)
     Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-error[E0689]: can't call method `to_radians` on ambiguous numeric type `{float}`
-   --> crates/client/src/renderer.rs:177:74
+warning: `voxel` (lib test) generated 16 warnings (8 duplicates) (run `cargo clippy --fix --lib -p voxel --tests -- ` to apply 5 suggestions)
+warning: used `unwrap()` on `Some` value
+   --> crates/client/src/gfx.rs:464:19
     |
-177 |         let fov = (72.0 + if game.player.sprinting { 8.0 } else { 0.0 }).to_radians();
-    |                                                                          ^^^^^^^^^^
+464 |                 ..depth_state.unwrap()
+    |                   ^^^^^^^^^^^^^^^^^^^^
+    |
+help: remove the `Some` and `unwrap()`
+   --> crates/client/src/gfx.rs:329:27
+    |
+329 |           let depth_state = Some(wgpu::DepthStencilState {
+    |  ___________________________^
+330 | |             format: DEPTH_FORMAT,
+331 | |             depth_write_enabled: true,
+332 | |             depth_compare: wgpu::CompareFunction::Less,
+333 | |             stencil: wgpu::StencilState::default(),
+334 | |             bias: wgpu::DepthBiasState::default(),
+335 | |         });
+    | |__________^
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_literal_unwrap
+    = note: `#[warn(clippy::unnecessary_literal_unwrap)]` on by default
 
-For more information about this error, try `rustc --explain E0689`.
-error: could not compile `mc-client` (lib) due to 1 previous error
-warning: build failed, waiting for other jobs to finish...
+warning: casting to the same type is unnecessary (`usize` -> `usize`)
+   --> crates/client/src/renderer.rs:505:30
+    |
+505 |                 triangles += particle_count as usize / 6 * 2;
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^ help: try: `particle_count`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
+    = note: `#[warn(clippy::unnecessary_cast)]` on by default
+
+warning: `mc-client` (lib test) generated 2 warnings (1 duplicate)
+warning: `mc-client` (lib) generated 2 warnings (1 duplicate) (run `cargo clippy --fix --lib -p mc-client -- ` to apply 1 suggestion)
+    Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
+    Checking mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
+warning: this `if` can be collapsed into the outer `match`
+   --> crates/desktop/src/main.rs:125:29
+    |
+125 | / ...                   if state == ElementState::Pressed {
+126 | | ...                       app.input.pick = true;
+127 | | ...                   }
+    | |_______________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#collapsible_match
+    = note: `#[warn(clippy::collapsible_match)]` on by default
+help: collapse nested if block
+    |
+124 ~                         MouseButton::Middle
+125 ~                             if state == ElementState::Pressed => {
+126 |                                 app.input.pick = true;
+127 ~                             }
+    |
+
+warning: `mc-desktop` (bin "mc" test) generated 1 warning (run `cargo clippy --fix --bin "mc" -p mc-desktop --tests -- ` to apply 1 suggestion)
+warning: `mc-desktop` (bin "mc") generated 1 warning (1 duplicate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.26s

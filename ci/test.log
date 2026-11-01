@@ -1,3 +1,65 @@
+   Compiling unicode-ident v1.0.27
+   Compiling cfg-if v1.0.5
+   Compiling bitflags v2.13.2
+   Compiling once_cell v1.21.4
+   Compiling libloading v0.8.9
+   Compiling proc-macro2 v1.0.107
+   Compiling log v0.4.35
+   Compiling smallvec v1.16.4
+   Compiling libc v0.2.191
+   Compiling linux-raw-sys v0.12.1
+   Compiling arrayvec v0.7.8
+   Compiling dlib v0.5.3
+   Compiling quote v1.0.47
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling rustix v1.1.6
+   Compiling foldhash v0.1.5
+   Compiling termcolor v1.4.1
+   Compiling slab v0.4.12
+   Compiling unicode-width v0.1.14
+   Compiling scopeguard v1.2.0
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling bit-vec v0.6.3
+   Compiling bit-set v0.5.3
+   Compiling indexmap v2.14.2
+   Compiling lock_api v0.4.14
+   Compiling codespan-reporting v0.11.1
+   Compiling hashbrown v0.15.5
+   Compiling num-traits v0.2.19
+   Compiling wayland-sys v0.31.11
+   Compiling parking_lot_core v0.9.12
+   Compiling gpu-descriptor-types v0.2.0
+   Compiling gpu-alloc-types v0.3.1
+   Compiling spirv v0.3.0+sdk-1.3.268.0
+   Compiling libloading v0.7.4
+   Compiling downcast-rs v1.2.1
+   Compiling raw-window-handle v0.6.2
+   Compiling unicode-xid v0.2.6
+   Compiling scoped-tls v1.0.1
+   Compiling rustc-hash v1.1.0
+   Compiling hexf-parse v0.2.1
+   Compiling wayland-backend v0.3.17
+   Compiling ash v0.37.3+1.3.251
+   Compiling thiserror-impl v1.0.69
+   Compiling gpu-alloc v0.6.2
+   Compiling gpu-descriptor v0.3.2
+   Compiling parking_lot v0.12.5
+   Compiling thiserror v1.0.69
+   Compiling naga v0.20.0
+   Compiling khronos-egl v6.0.0
+   Compiling wgpu-types v0.20.0
+   Compiling renderdoc-sys v1.1.0
+   Compiling glow v0.13.1
+   Compiling profiling v1.0.18
+   Compiling glam v0.27.0
+   Compiling wayland-scanner v0.31.11
+   Compiling bytemuck_derive v1.12.1
+   Compiling wgpu-hal v0.21.1
+   Compiling wasm-bindgen-shared v0.2.130
+   Compiling wasm-bindgen-macro-support v0.2.130
+   Compiling bytemuck v1.25.2
    Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
@@ -10,12 +72,63 @@ warning: field `screen` is never read
    |
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
 warning: `voxel` (lib) generated 1 warning
+   Compiling wgpu-core v0.21.1
+   Compiling wayland-client v0.31.15
+   Compiling static_assertions v1.1.0
+   Compiling wgpu v0.20.1
+   Compiling linux-raw-sys v0.4.15
+   Compiling futures-core v0.3.34
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-task v0.3.34
+   Compiling futures-util v0.3.34
+   Compiling rustix v0.38.44
+   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+   Compiling wayland-protocols v0.31.2
+   Compiling wasm-bindgen-macro v0.2.130
+   Compiling wasm-bindgen v0.2.130
+   Compiling polling v3.11.0
+   Compiling calloop v0.12.4
+   Compiling js-sys v0.3.107
+   Compiling xkeysym v0.2.1
+   Compiling arrayref v0.3.9
+   Compiling cursor-icon v1.2.0
+   Compiling strict-num v0.1.1
+   Compiling ttf-parser v0.25.1
+   Compiling xcursor v0.3.11
+   Compiling wayland-cursor v0.31.14
+   Compiling owned_ttf_parser v0.25.1
+   Compiling tiny-skia-path v0.11.4
+   Compiling wayland-csd-frame v0.3.0
+   Compiling calloop-wayland-source v0.2.0
+   Compiling wayland-protocols-wlr v0.2.0
+   Compiling memmap2 v0.9.12
+   Compiling pollster v0.3.0
+   Compiling ab_glyph_rasterizer v0.1.10
+   Compiling ab_glyph v0.2.32
+   Compiling smithay-client-toolkit v0.18.1
+   Compiling tiny-skia v0.11.4
+   Compiling zerocopy v0.8.63
+   Compiling getrandom v0.3.4
+   Compiling wasm-bindgen-futures v0.4.80
+   Compiling web-sys v0.3.107
+   Compiling console_error_panic_hook v0.1.7
+   Compiling gethostname v1.1.0
+   Compiling as-raw-xcb-connection v1.0.1
+   Compiling x11rb-protocol v0.13.2
+   Compiling ahash v0.8.12
+   Compiling sctk-adwaita v0.8.3
+   Compiling x11-dl v2.21.0
+   Compiling xkbcommon-dl v0.4.2
+   Compiling wayland-protocols-plasma v0.2.0
+   Compiling percent-encoding v2.3.2
+   Compiling smol_str v0.2.2
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-   Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
 warning: `voxel` (lib test) generated 1 warning (1 duplicate)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.32s
+   Compiling x11rb v0.13.2
+   Compiling winit v0.29.15
+   Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 11s
      Running unittests src/lib.rs (target/debug/deps/mc_client-fda619e0935b38e5)
 
 running 0 tests
@@ -27,7 +140,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 1 test
 test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.45s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.56s
 
      Running unittests src/main.rs (target/debug/deps/mc-21f40234b8b2a145)
 
@@ -43,17 +156,19 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
      Running unittests src/lib.rs (target/debug/deps/voxel-1c877c120d599117)
 
-running 38 tests
+running 40 tests
 test block::tests::every_id_has_a_def ... ok
 test block::tests::inventory_only_lists_real_blocks ... ok
 test block::tests::water_and_plants_are_not_solid ... ok
 test font::tests::glyph_cells_are_unique_per_char ... ok
-test font::tests::lowercase_maps_to_upper ... ok
 test font::tests::every_glyph_row_is_five_wide ... ok
+test font::tests::lowercase_maps_to_upper ... ok
 test game::tests::daylight_is_darker_at_midnight ... ok
-test game::tests::spawn_is_above_solid_ground ... ok
-test game::tests::creative_break_is_instant ... ok
 test game::tests::hotbar_wraps_around ... ok
+test game::tests::creative_break_is_instant ... ok
+test game::tests::mobs_fall_onto_the_ground ... ok
+test game::tests::punching_a_mob_damages_it ... ok
+test game::tests::spawn_is_above_solid_ground ... ok
 test mesher::tests::unit_cube_has_24_vertices ... ok
 test mesher::tests::flat_world_emits_only_top_faces ... ok
 test noise::tests::hashes_are_deterministic ... ok
@@ -61,12 +176,12 @@ test noise::tests::noise_stays_in_range ... ok
 test noise::tests::rng_is_reproducible ... ok
 test mesher::tests::water_goes_to_its_own_buffer ... ok
 test physics::tests::look_direction_is_unit_length ... ok
+test physics::tests::walls_block_movement ... ok
 test physics::tests::falls_until_it_lands ... ok
 test raycast::tests::hits_the_block_below ... ok
-test physics::tests::walls_block_movement ... ok
 test raycast::tests::misses_when_out_of_range ... ok
-test raycast::tests::water_is_transparent_to_rays ... ok
 test game::tests::streaming_loads_chunks_around_the_player ... ok
+test raycast::tests::water_is_transparent_to_rays ... ok
 test textures::tests::atlas_has_expected_size ... ok
 test textures::tests::stone_tile_is_not_empty ... ok
 test textures::tests::uvs_stay_in_unit_range ... ok
@@ -74,16 +189,16 @@ test world::tests::edit_roundtrip ... ok
 test world::tests::edits_survive_unload ... ok
 test world::tests::loading_marks_neighbours_dirty ... ok
 test world::tests::out_of_range_access_is_air ... ok
-test game::tests::survival_collects_blocks ... ok
-test worldgen::tests::generation_is_deterministic ... ok
 test worldgen::tests::different_seeds_differ ... ok
-test worldgen::tests::spawn_is_on_land ... ok
+test worldgen::tests::generation_is_deterministic ... ok
 test worldgen::tests::height_map_matches_blocks ... ok
+test worldgen::tests::spawn_is_on_land ... ok
 test worldgen::tests::surface_is_solid_and_covers_the_column ... ok
+test game::tests::survival_collects_blocks ... ok
 test save::tests::rejects_garbage ... ok
 test save::tests::roundtrip_preserves_state ... ok
 
-test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.99s
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.92s
 
    Doc-tests mc_client
 
@@ -103,6 +218,22 @@ running 0 tests
 
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
+   Compiling bitflags v2.13.2
+   Compiling smallvec v1.16.4
+   Compiling thiserror v1.0.69
+   Compiling syn v3.0.9
+   Compiling wgpu v0.20.1
+   Compiling parking_lot_core v0.9.12
+   Compiling spirv v0.3.0+sdk-1.3.268.0
+   Compiling gpu-alloc-types v0.3.1
+   Compiling gpu-descriptor-types v0.2.0
+   Compiling gpu-alloc v0.6.2
+   Compiling gpu-descriptor v0.3.2
+   Compiling parking_lot v0.12.5
+   Compiling naga v0.20.0
+   Compiling wgpu-types v0.20.0
+   Compiling bytemuck_derive v1.12.1
+   Compiling bytemuck v1.25.2
    Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
@@ -115,15 +246,18 @@ warning: field `screen` is never read
    |
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+   Compiling wgpu-hal v0.21.1
 warning: `voxel` (lib) generated 1 warning
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.81s
+   Compiling wgpu-core v0.21.1
+   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 48.52s
      Running tests/gpu_smoke.rs (target/debug/deps/gpu_smoke-69a37505b3ef8983)
 
 running 1 test
-rendered 1280x720: 258 colour buckets, sky 38.7%, centre pixel [60, 80, 109], draws 16, tris 32248
+rendered 1280x720 with 8 mobs: 315 colour buckets, sky 32.1%, centre pixel [60, 80, 109], draws 17, tris 32872
+mob geometry: 1848 vertices for 8 mobs
 wrote /home/runner/work/MC/MC/crates/client/../../ci/frame.png
 test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.16s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.07s
 

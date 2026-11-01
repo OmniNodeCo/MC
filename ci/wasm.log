@@ -1,5 +1,55 @@
+info: downloading component rust-std
+info: downloading wasm-pack
+info: successfully installed wasm-pack to `/home/runner/.cargo/bin/wasm-pack`
 [INFO]: 🎯  Checking for the Wasm target...
 [INFO]: 🌀  Compiling to Wasm...
+   Compiling wasm-bindgen-shared v0.2.130
+   Compiling rustversion v1.0.23
+   Compiling cfg-if v1.0.5
+   Compiling syn v3.0.9
+   Compiling bumpalo v3.20.3
+   Compiling unicode-ident v1.0.27
+   Compiling slab v0.4.12
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-task v0.3.34
+   Compiling wasm-bindgen v0.2.130
+   Compiling futures-core v0.3.34
+   Compiling slotmap v1.1.1
+   Compiling futures-util v0.3.34
+   Compiling parking_lot_core v0.9.12
+   Compiling thiserror v1.0.69
+   Compiling num-traits v0.2.19
+   Compiling bitflags v2.13.2
+   Compiling bit-vec v0.6.3
+   Compiling unicode-width v0.1.14
+   Compiling scopeguard v1.2.0
+   Compiling smallvec v1.16.4
+   Compiling termcolor v1.4.1
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling codespan-reporting v0.11.1
+   Compiling indexmap v2.14.2
+   Compiling lock_api v0.4.14
+   Compiling bit-set v0.5.3
+   Compiling wgpu-hal v0.21.1
+   Compiling rustc-hash v1.1.0
+   Compiling arrayvec v0.7.8
+   Compiling wasm-bindgen-macro-support v0.2.130
+   Compiling unicode-xid v0.2.6
+   Compiling hexf-parse v0.2.1
+   Compiling log v0.4.35
+   Compiling naga v0.20.0
+   Compiling parking_lot v0.12.5
+   Compiling wgpu-core v0.21.1
+   Compiling profiling v1.0.18
+   Compiling once_cell v1.21.4
+   Compiling raw-window-handle v0.6.2
+   Compiling wgpu v0.20.1
+   Compiling bytemuck_derive v1.12.1
+   Compiling static_assertions v1.1.0
+   Compiling glam v0.27.0
+   Compiling bytemuck v1.25.2
+   Compiling wasm-bindgen-macro v0.2.130
    Compiling voxel v0.1.0 (/home/runner/work/MC/MC/crates/voxel)
 warning: field `screen` is never read
   --> crates/voxel/src/ui.rs:35:5
@@ -12,13 +62,19 @@ warning: field `screen` is never read
    |
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+   Compiling js-sys v0.3.107
+   Compiling console_error_panic_hook v0.1.7
 warning: `voxel` (lib) generated 1 warning
+   Compiling web-sys v0.3.107
+   Compiling wasm-bindgen-futures v0.4.80
+   Compiling glow v0.13.1
+   Compiling wgpu-types v0.20.0
+   Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `release` profile [optimized] target(s) in 2.93s
+    Finished `release` profile [optimized] target(s) in 48.47s
 [INFO]: ⬇️  Installing wasm-bindgen...
 [INFO]: Optional field missing from Cargo.toml: 'repository'. This is not necessary, but recommended
 [INFO]: License key is set in Cargo.toml but no LICENSE file(s) were found; Please add the LICENSE file(s) to your project directory
-[INFO]: ✨   Done in 4.10s
+[INFO]: ✨   Done in 49.35s
 [INFO]: 📦   Your wasm pkg is ready to publish at web/pkg.
 [WARN]: ⚠️   There's a newer version of wasm-pack available, the new version is: 0.15.1, you are using: 0.13.1. To update, navigate to: https://rustwasm.github.io/wasm-pack/installer/
