@@ -15,7 +15,7 @@ warning: `voxel` (lib) generated 1 warning
    Compiling mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
    Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
 warning: `voxel` (lib test) generated 1 warning (1 duplicate)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.92s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.41s
      Running unittests src/lib.rs (target/debug/deps/mc_client-fda619e0935b38e5)
 
 running 0 tests
@@ -27,7 +27,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 1 test
 test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.64s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.54s
 
      Running unittests src/main.rs (target/debug/deps/mc-21f40234b8b2a145)
 
@@ -47,17 +47,17 @@ running 45 tests
 test block::tests::every_id_has_a_def ... ok
 test block::tests::inventory_only_lists_real_blocks ... ok
 test block::tests::water_and_plants_are_not_solid ... ok
+test font::tests::every_glyph_row_is_five_wide ... ok
 test font::tests::glyph_cells_are_unique_per_char ... ok
 test font::tests::lowercase_maps_to_upper ... ok
-test font::tests::every_glyph_row_is_five_wide ... ok
 test game::tests::daylight_is_darker_at_midnight ... ok
 test game::tests::damage_kills_and_respawn_heals ... ok
 test game::tests::creative_players_take_no_damage ... ok
 test game::tests::creative_break_is_instant ... ok
 test game::tests::hotbar_wraps_around ... ok
 test game::tests::mobs_fall_onto_the_ground ... ok
-test game::tests::punching_a_mob_damages_it ... ok
 test game::tests::hunger_drains_while_sprinting ... ok
+test game::tests::punching_a_mob_damages_it ... ok
 test game::tests::spawn_is_above_solid_ground ... ok
 test game::tests::spawning_places_a_creature_on_the_ground ... ok
 test mesher::tests::flat_world_emits_only_top_faces ... ok
@@ -66,12 +66,12 @@ test mesher::tests::water_goes_to_its_own_buffer ... ok
 test noise::tests::hashes_are_deterministic ... ok
 test noise::tests::noise_stays_in_range ... ok
 test noise::tests::rng_is_reproducible ... ok
-test game::tests::streaming_loads_chunks_around_the_player ... ok
-test physics::tests::look_direction_is_unit_length ... ok
 test physics::tests::falls_until_it_lands ... ok
+test physics::tests::look_direction_is_unit_length ... ok
+test game::tests::streaming_loads_chunks_around_the_player ... ok
 test raycast::tests::hits_the_block_below ... ok
-test raycast::tests::misses_when_out_of_range ... ok
 test physics::tests::walls_block_movement ... ok
+test raycast::tests::misses_when_out_of_range ... ok
 test raycast::tests::water_is_transparent_to_rays ... ok
 test game::tests::survival_collects_blocks ... ok
 test textures::tests::atlas_has_expected_size ... ok
@@ -90,7 +90,7 @@ test worldgen::tests::surface_is_solid_and_covers_the_column ... ok
 test save::tests::rejects_garbage ... ok
 test save::tests::roundtrip_preserves_state ... ok
 
-test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.73s
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.97s
 
    Doc-tests mc_client
 
@@ -124,14 +124,14 @@ warning: field `screen` is never read
 
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
 warning: `voxel` (lib) generated 1 warning
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.40s
      Running tests/gpu_smoke.rs (target/debug/deps/gpu_smoke-69a37505b3ef8983)
 
 running 1 test
-rendered 1280x720 with 8 mobs: 312 colour buckets, sky 33.6%, centre pixel [60, 80, 109], draws 17, tris 32872
+rendered 1280x720 with 8 mobs: 310 colour buckets, sky 33.4%, centre pixel [60, 80, 109], draws 17, tris 32872
 mob geometry: 1848 vertices for 8 mobs
 wrote /home/runner/work/MC/MC/crates/client/../../ci/frame.png
 test renders_a_world_frame_offscreen ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.23s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.16s
 

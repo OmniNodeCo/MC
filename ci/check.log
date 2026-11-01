@@ -19,6 +19,6 @@ warning: field `screen` is never read
 warning: `voxel` (lib test) generated 1 warning (1 duplicate)
 warning: `voxel` (lib) generated 1 warning
     Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-    Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
     Checking mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.33s
+    Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.93s
