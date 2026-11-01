@@ -156,9 +156,9 @@ warning: casting to the same type is unnecessary (`i32` -> `i32`)
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
-warning: `voxel` (lib test) generated 16 warnings (15 duplicates) (run `cargo clippy --fix --lib -p voxel --tests -- ` to apply 1 suggestion)
-warning: `voxel` (lib) generated 15 warnings (run `cargo clippy --fix --lib -p voxel -- ` to apply 11 suggestions)
+warning: `voxel` (lib) generated 15 warnings (2 duplicates) (run `cargo clippy --fix --lib -p voxel -- ` to apply 9 suggestions)
     Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
+warning: `voxel` (lib test) generated 16 warnings (13 duplicates) (run `cargo clippy --fix --lib -p voxel --tests -- ` to apply 3 suggestions)
 warning: used `unwrap()` on `Some` value
    --> crates/client/src/gfx.rs:464:19
     |
@@ -189,8 +189,8 @@ warning: casting to the same type is unnecessary (`usize` -> `usize`)
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
     = note: `#[warn(clippy::unnecessary_cast)]` on by default
 
-warning: `mc-client` (lib test) generated 2 warnings (1 duplicate) (run `cargo clippy --fix --lib -p mc-client --tests -- ` to apply 1 suggestion)
-warning: `mc-client` (lib) generated 2 warnings (1 duplicate)
+warning: `mc-client` (lib test) generated 2 warnings (1 duplicate)
+warning: `mc-client` (lib) generated 2 warnings (1 duplicate) (run `cargo clippy --fix --lib -p mc-client -- ` to apply 1 suggestion)
     Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
     Checking mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
 warning: this `if` can be collapsed into the outer `match`
@@ -211,6 +211,6 @@ help: collapse nested if block
 127 ~                             }
     |
 
-warning: `mc-desktop` (bin "mc" test) generated 1 warning (run `cargo clippy --fix --bin "mc" -p mc-desktop --tests -- ` to apply 1 suggestion)
-warning: `mc-desktop` (bin "mc") generated 1 warning (1 duplicate)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.14s
+warning: `mc-desktop` (bin "mc") generated 1 warning (run `cargo clippy --fix --bin "mc" -p mc-desktop -- ` to apply 1 suggestion)
+warning: `mc-desktop` (bin "mc" test) generated 1 warning (1 duplicate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.72s

@@ -13,4 +13,4 @@ warning: field `screen` is never read
    Compiling mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
 warning: `voxel` (lib) generated 1 warning
    Compiling mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
-    Finished `release` profile [optimized] target(s) in 29.90s
+    Finished `release` profile [optimized] target(s) in 28.83s
