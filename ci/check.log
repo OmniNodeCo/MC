@@ -16,9 +16,9 @@ warning: field `screen` is never read
    |
    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
 
-warning: `voxel` (lib test) generated 1 warning
-warning: `voxel` (lib) generated 1 warning (1 duplicate)
+warning: `voxel` (lib test) generated 1 warning (1 duplicate)
+warning: `voxel` (lib) generated 1 warning
     Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
     Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
     Checking mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 6.48s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 5.33s
