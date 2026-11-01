@@ -582,6 +582,7 @@ fn quadruped(out: &mut Vec<Vertex>, mob: &Mob, tint: f32, swing: f32, p: &Propor
     let body_tile = tb;
     let face_tile = tb + 1;
     let limb_tile = tb + 2;
+    let head_tile = tb + 3;
 
     // body
     push_box(
@@ -600,7 +601,7 @@ fn quadruped(out: &mut Vec<Vertex>, mob: &Mob, tint: f32, swing: f32, p: &Propor
         base,
         Vec3::new(0.0, head_y, p.head_z),
         p.head,
-        body_tile,
+        head_tile,
         tint,
     );
     push_front(
@@ -690,8 +691,8 @@ fn sheep_parts() -> Proportions {
         body: Vec3::new(0.7, 0.6, 0.95),
         body_y: 0.7,
         head: Vec3::new(0.42, 0.42, 0.42),
-        head_y: 0.92,
-        head_z: 0.62,
+        head_y: 1.02,
+        head_z: 0.66,
         leg_h: 0.38,
         leg_w: 0.16,
         leg_gap: 0.22,
