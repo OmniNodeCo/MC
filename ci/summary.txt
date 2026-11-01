@@ -1,21 +1,21 @@
-run: 41332908176 Sun Nov  1 17:50:15 UTC 2026
-commit: 1916cda47b5b62797a98753f2e41660224ef509c
+run: 41333873396 Sun Nov  1 17:56:37 UTC 2026
+commit: 51f924f33a39c1eea2c07bd02e7bb7d478d89dca
 native check: 0
 native test:  0
 native build: 0
 wasm build:   0
 
 ===== gpu smoke test =====
-rendered 1280x720 with 8 mobs: 315 colour buckets, sky 32.1%, centre pixel [60, 80, 109], draws 17, tris 32872
+rendered 1280x720 with 8 mobs: 314 colour buckets, sky 33.2%, centre pixel [60, 80, 109], draws 17, tris 32872
 wrote /home/runner/work/MC/MC/crates/client/../../ci/frame.png
 
 
 ===== test summary =====
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.56s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.63s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.92s
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.95s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.07s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.08s

@@ -19,19 +19,6 @@ warning: this function has too many arguments (8/7)
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
     = note: `#[warn(clippy::too_many_arguments)]` on by default
 
-warning: items after a test module
-   --> crates/voxel/src/mesher.rs:328:1
-    |
-328 | mod tests {
-    | ^^^^^^^^^
-...
-375 | pub fn tile_cube(tile: u32, inflate: f32) -> MeshData {
-    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    |
-    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
-    = note: `#[warn(clippy::items_after_test_module)]` on by default
-    = help: move the items to before the test module was defined
-
 warning: this function has too many arguments (8/7)
    --> crates/voxel/src/mesher.rs:163:1
     |
@@ -45,6 +32,19 @@ warning: this function has too many arguments (8/7)
     | |_^
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#too_many_arguments
+
+warning: items after a test module
+   --> crates/voxel/src/mesher.rs:328:1
+    |
+328 | mod tests {
+    | ^^^^^^^^^
+...
+375 | pub fn tile_cube(tile: u32, inflate: f32) -> MeshData {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#items_after_test_module
+    = note: `#[warn(clippy::items_after_test_module)]` on by default
+    = help: move the items to before the test module was defined
 
 warning: manual implementation of an assign operation
   --> crates/voxel/src/particles.rs:76:17
@@ -156,9 +156,9 @@ warning: casting to the same type is unnecessary (`i32` -> `i32`)
     |
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
 
-warning: `voxel` (lib) generated 15 warnings (7 duplicates) (run `cargo clippy --fix --lib -p voxel -- ` to apply 7 suggestions)
+warning: `voxel` (lib) generated 15 warnings (3 duplicates) (run `cargo clippy --fix --lib -p voxel -- ` to apply 9 suggestions)
     Checking mc-client v0.1.0 (/home/runner/work/MC/MC/crates/client)
-warning: `voxel` (lib test) generated 16 warnings (8 duplicates) (run `cargo clippy --fix --lib -p voxel --tests -- ` to apply 5 suggestions)
+warning: `voxel` (lib test) generated 16 warnings (12 duplicates) (run `cargo clippy --fix --lib -p voxel --tests -- ` to apply 3 suggestions)
 warning: used `unwrap()` on `Some` value
    --> crates/client/src/gfx.rs:464:19
     |
@@ -189,8 +189,8 @@ warning: casting to the same type is unnecessary (`usize` -> `usize`)
     = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#unnecessary_cast
     = note: `#[warn(clippy::unnecessary_cast)]` on by default
 
-warning: `mc-client` (lib test) generated 2 warnings (1 duplicate)
-warning: `mc-client` (lib) generated 2 warnings (1 duplicate) (run `cargo clippy --fix --lib -p mc-client -- ` to apply 1 suggestion)
+warning: `mc-client` (lib test) generated 2 warnings (1 duplicate) (run `cargo clippy --fix --lib -p mc-client --tests -- ` to apply 1 suggestion)
+warning: `mc-client` (lib) generated 2 warnings (1 duplicate)
     Checking mc-desktop v0.1.0 (/home/runner/work/MC/MC/crates/desktop)
     Checking mc-web v0.1.0 (/home/runner/work/MC/MC/crates/webapp)
 warning: this `if` can be collapsed into the outer `match`
@@ -211,6 +211,6 @@ help: collapse nested if block
 127 ~                             }
     |
 
-warning: `mc-desktop` (bin "mc" test) generated 1 warning (run `cargo clippy --fix --bin "mc" -p mc-desktop --tests -- ` to apply 1 suggestion)
-warning: `mc-desktop` (bin "mc") generated 1 warning (1 duplicate)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.26s
+warning: `mc-desktop` (bin "mc") generated 1 warning (run `cargo clippy --fix --bin "mc" -p mc-desktop -- ` to apply 1 suggestion)
+warning: `mc-desktop` (bin "mc" test) generated 1 warning (1 duplicate)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2.18s
