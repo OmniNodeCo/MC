@@ -655,28 +655,28 @@ fn quadruped(out: &mut Vec<Vertex>, mob: &Mob, tint: f32, swing: f32, p: &Propor
 
 fn pig_parts() -> Proportions {
     Proportions {
-        body: Vec3::new(0.62, 0.5, 1.0),
-        body_y: 0.52,
-        head: Vec3::new(0.5, 0.5, 0.5),
-        head_y: 0.6,
-        head_z: 0.72,
-        leg_h: 0.34,
-        leg_w: 0.18,
-        leg_gap: 0.22,
+        body: Vec3::new(0.64, 0.5, 0.9),
+        body_y: 0.5,
+        head: Vec3::new(0.46, 0.46, 0.44),
+        head_y: 0.62,
+        head_z: 0.62,
+        leg_h: 0.3,
+        leg_w: 0.16,
+        leg_gap: 0.2,
         legs: 4,
         arms: false,
-        splay: 0.34,
+        splay: 0.3,
     }
 }
 
 fn cow_parts() -> Proportions {
     Proportions {
-        body: Vec3::new(0.72, 0.62, 1.3),
+        body: Vec3::new(0.74, 0.62, 1.15),
         body_y: 0.82,
-        head: Vec3::new(0.52, 0.52, 0.52),
-        head_y: 1.0,
-        head_z: 0.92,
-        leg_h: 0.52,
+        head: Vec3::new(0.48, 0.48, 0.46),
+        head_y: 1.04,
+        head_z: 0.78,
+        leg_h: 0.5,
         leg_w: 0.2,
         leg_gap: 0.24,
         legs: 4,
@@ -687,12 +687,12 @@ fn cow_parts() -> Proportions {
 
 fn sheep_parts() -> Proportions {
     Proportions {
-        body: Vec3::new(0.72, 0.6, 1.1),
+        body: Vec3::new(0.7, 0.6, 0.95),
         body_y: 0.7,
-        head: Vec3::new(0.4, 0.44, 0.44),
+        head: Vec3::new(0.42, 0.42, 0.42),
         head_y: 0.92,
-        head_z: 0.78,
-        leg_h: 0.4,
+        head_z: 0.62,
+        leg_h: 0.38,
         leg_w: 0.16,
         leg_gap: 0.22,
         legs: 4,
@@ -703,11 +703,11 @@ fn sheep_parts() -> Proportions {
 
 fn chicken_parts() -> Proportions {
     Proportions {
-        body: Vec3::new(0.4, 0.42, 0.5),
-        body_y: 0.44,
-        head: Vec3::new(0.28, 0.3, 0.28),
-        head_y: 0.75,
-        head_z: 0.16,
+        body: Vec3::new(0.4, 0.4, 0.46),
+        body_y: 0.42,
+        head: Vec3::new(0.26, 0.28, 0.26),
+        head_y: 0.68,
+        head_z: 0.14,
         leg_h: 0.24,
         leg_w: 0.1,
         leg_gap: 0.12,
