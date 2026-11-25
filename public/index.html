@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voxelheim — hand-built voxel world</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="hud">
+    <div id="crosshair"><i></i><i></i></div>
+    <div id="mineprog" class="hidden"></div>
+    <div id="hearts"></div>
+    <div id="bubbles" class="hidden"></div>
+    <div id="hotbar"></div>
+    <div id="debug" class="hidden"></div>
+    <div id="toasts"></div>
+    <div id="vignette"></div>
+    <div id="waterfx"></div>
+  </div>
+
+  <div id="palette" class="hidden">
+    <div class="panel">
+      <div class="panel-title">Block Palette</div>
+      <div class="panel-sub">Click a block to bind it to the selected hotbar slot — E or Esc to close</div>
+      <div id="palette-grid"></div>
+    </div>
+  </div>
+
+  <div id="overlay">
+    <div class="panel" id="overlay-card">
+      <div id="overlay-content"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

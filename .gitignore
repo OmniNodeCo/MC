@@ -1,3 +1,1 @@
-/target
-web/pkg
-/ci
+node_modules/

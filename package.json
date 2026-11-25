@@ -1,0 +1,16 @@
+{
+  "name": "voxelheim",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Voxelheim — a hand-built voxel sandbox game: custom engine, original creatures, hand-coded pixel textures.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tools/selftest.mjs && node tools/sim.mjs"
+  },
+  "dependencies": {
+    "three": "^0.171.0"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.2.1"
+  }
+}
