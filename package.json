@@ -6,7 +6,8 @@
   "description": "Voxelheim — a hand-built voxel sandbox game: original engine, creatures, and code-painted textures. Runs in the browser or as a native desktop app.",
   "main": "desktop/main.mjs",
   "author": {
-    "name": "OmniNodeCo"
+    "name": "OmniNodeCo",
+    "email": "OmniNodeCo@users.noreply.github.com"
   },
   "license": "MIT",
   "scripts": {
