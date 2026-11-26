@@ -56,8 +56,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -d "$TAG" 2>/dev/null || true
+          git push origin ":refs/tags/$TAG" 2>/dev/null || true
           git tag -a "$TAG" -m "Voxelheim $TAG" "$GITHUB_SHA"
-          git push origin "$TAG"
+          git push origin "$TAG" --force
 
       - name: Package web bundle
         run: node tools/package.mjs "$VER"
@@ -198,9 +200,9 @@ jobs:
             "Voxelheim-$VER-Windows-Portable-x64.exe" \
             "Voxelheim-$VER-macOS-x64.dmg" \
             "Voxelheim-$VER-macOS-arm64.dmg" \
-            "Voxelheim-$VER-Linux-x64.rpm" \
-            "Voxelheim-$VER-Linux-x64.AppImage" \
-            "Voxelheim-$VER-Linux-x64.deb" \
+            "Voxelheim-$VER-Linux-x86_64.rpm" \
+            "Voxelheim-$VER-Linux-x86_64.AppImage" \
+            "Voxelheim-$VER-Linux-x86_64.deb" \
             "voxelheim-$VER.zip" \
             "atlas_big.png" \
             "mobs.png"; do

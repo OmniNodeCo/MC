@@ -106,8 +106,8 @@ Release assets per version:
 | OS | Assets |
 |---|---|
 | Windows | `Voxelheim-<v>-Windows-Setup-x64.exe`, `...-Portable-x64.exe` |
-| macOS | `Voxelheim-<v>-macOS-x64.dmg`, `...-arm64.dmg` (+ portable `.zip`s) |
-| Linux | `Voxelheim-<v>-Linux-x64.rpm`, `.deb`, `.AppImage` |
+| macOS | `Voxelheim-<v>-macOS-x64.dmg`, `...-arm64.dmg` (+ `.zip` archives) |
+| Linux | `Voxelheim-<v>-Linux-x86_64.rpm`, `.deb`, `.AppImage` |
 | Web | `voxelheim-<v>.zip` (+ texture preview PNGs) |
 
 The desktop app icon is generated from the game's own pixel art (`tools/icon.mjs`) —
