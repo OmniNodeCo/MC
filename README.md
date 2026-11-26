@@ -6,12 +6,19 @@ A hand-built voxel sandbox game that runs entirely in the browser — original e
 
 ## Run it
 
+**Desktop (Windows / macOS / Linux):** grab the latest release —
+`.exe` installer or portable exe (Windows), `.dmg` (macOS, Intel + Apple Silicon),
+`.rpm` / `.deb` / `.AppImage` (Linux). Every release also ships a portable web bundle.
+
+**From source:**
+
 ```bash
 npm install
-npm start          # serves on http://localhost:3000
+npm start          # web: http://localhost:3000
+npm run dist       # native desktop packages for this OS (electron-builder)
 ```
 
-Open the page, press **PLAY**, and you're in the world.
+Open the page (or launch the app), press **PLAY**, and you're in the world.
 
 ## Controls
 
@@ -87,12 +94,25 @@ to change the destination).
 ## CI & releases
 
 - **`.github/workflows/build.yml`** — on every push/PR: runs both test suites, renders
-  texture previews, packages the game, and uploads `voxelheim-<sha>.zip` plus the
-  preview PNGs as artifacts. Results are written to the job summary.
+  texture previews, packages the web bundle, and builds native desktop packages on
+  Windows, macOS and Linux runners (Electron). All artifacts are uploaded.
 - **`.github/workflows/release.yml`** — on a `v*` tag push (or manual dispatch with a
-  version input): runs tests, packages `voxelheim-<version>.zip`, and publishes a
-  GitHub release with the bundle and texture previews attached. Run it with:
-  `gh workflow run release.yml -f version=v1.0.1`.
+  version input): runs tests, builds **all platform packages**, verifies every expected
+  asset exists, and publishes a GitHub release with installers for every OS attached.
+  Run it with: `gh workflow run release.yml -f version=v1.1.1`.
 
-To package locally: `node tools/package.mjs v1.0.0` → `dist/voxelheim-1.0.0.zip`.
+Release assets per version:
+
+| OS | Assets |
+|---|---|
+| Windows | `Voxelheim-<v>-Windows-Setup-x64.exe`, `...-Portable-x64.exe` |
+| macOS | `Voxelheim-<v>-macOS-x64.dmg`, `...-arm64.dmg` (+ portable `.zip`s) |
+| Linux | `Voxelheim-<v>-Linux-x64.rpm`, `.deb`, `.AppImage` |
+| Web | `voxelheim-<v>.zip` (+ texture preview PNGs) |
+
+The desktop app icon is generated from the game's own pixel art (`tools/icon.mjs`) —
+grass block, Gloomling, crystal shards — into `icon.png/.ico/.icns`.
+
+To package locally: `node tools/package.mjs v1.1.0` → `dist/voxelheim-1.1.0.zip`.
 Unzip, `npm install && npm start`, open http://localhost:3000.
+Desktop packaging requires network access to Electron binaries; it runs in CI.

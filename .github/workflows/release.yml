@@ -6,21 +6,19 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release tag, e.g. v1.0.1'
+        description: 'Release tag, e.g. v1.1.0'
         required: true
 
 permissions:
   contents: write
 
 jobs:
-  release:
-    name: Test, package & release
+  test:
+    name: Test & web package
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -46,7 +44,7 @@ jobs:
             *) TAG="v$TAG" ;;
           esac
           if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$'; then
-            echo "::error::invalid tag: $TAG (expected e.g. v1.0.1)"
+            echo "::error::invalid tag: $TAG (expected e.g. v1.1.0)"
             exit 1
           fi
           echo "TAG=$TAG" >> "$GITHUB_ENV"
@@ -61,7 +59,7 @@ jobs:
           git tag -a "$TAG" -m "Voxelheim $TAG" "$GITHUB_SHA"
           git push origin "$TAG"
 
-      - name: Package game
+      - name: Package web bundle
         run: node tools/package.mjs "$VER"
 
       - name: Render texture previews
@@ -69,16 +67,151 @@ jobs:
         env:
           VOXELHEIM_TEX_OUT: tex-preview
 
+      - name: Upload web bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: voxelheim-web-${{ github.sha }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Upload texture previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: texture-previews-${{ github.sha }}
+          path: tex-preview/*.png
+          if-no-files-found: error
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Voxelheim ${{ env.TAG || github.ref_name }} — tests"
+            echo ""
+            if [ -f test.log ]; then
+              echo '```'
+              grep -E "^(PASS|FAIL|[0-9]+/[0-9]+)" test.log || true
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  desktop:
+    name: Desktop ${{ matrix.os }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: --win --x64
+          - os: macos-latest
+            args: --mac --x64 --arm64
+          - os: ubuntu-latest
+            args: --linux --x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop app
+        run: npx electron-builder ${{ matrix.args }} --publish never
+
+      - name: Stage artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path stage | Out-Null
+          Copy-Item dist-desktop/*.exe stage/ -ErrorAction SilentlyContinue
+          Copy-Item dist-desktop/*.blockmap stage/ -ErrorAction SilentlyContinue
+          Copy-Item dist-desktop/latest*.yml stage/ -ErrorAction SilentlyContinue
+          Get-ChildItem stage | ForEach-Object { $_.Name }
+
+      - name: Stage artifacts (macOS / Linux)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p stage
+          cp dist-desktop/*.dmg stage/ 2>/dev/null || true
+          cp dist-desktop/*.zip stage/ 2>/dev/null || true
+          cp dist-desktop/*.rpm stage/ 2>/dev/null || true
+          cp dist-desktop/*.AppImage stage/ 2>/dev/null || true
+          cp dist-desktop/*.deb stage/ 2>/dev/null || true
+          cp dist-desktop/latest*.yml stage/ 2>/dev/null || true
+          ls -la stage/
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}-${{ github.sha }}
+          path: stage/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    needs: [test, desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          case "$TAG" in
+            v*) ;;
+            *) TAG="v$TAG" ;;
+          esac
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          VER="${TAG#v}"
+          echo "VER=$VER" >> "$GITHUB_ENV"
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: assets
+
+      - name: Verify every platform shipped
+        run: |
+          find assets -type f | sort
+          miss=0
+          for pat in \
+            "Voxelheim-$VER-Windows-Setup-x64.exe" \
+            "Voxelheim-$VER-Windows-Portable-x64.exe" \
+            "Voxelheim-$VER-macOS-x64.dmg" \
+            "Voxelheim-$VER-macOS-arm64.dmg" \
+            "Voxelheim-$VER-Linux-x64.rpm" \
+            "Voxelheim-$VER-Linux-x64.AppImage" \
+            "Voxelheim-$VER-Linux-x64.deb" \
+            "voxelheim-$VER.zip" \
+            "atlas_big.png" \
+            "mobs.png"; do
+            if [ -z "$(find assets -name "$pat" -print -quit)" ]; then
+              echo "::error::missing release asset: $pat"
+              miss=1
+            fi
+          done
+          [ "$miss" = 1 ] && exit 1
+          echo "all expected assets present"
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          FILES=$(find assets -type f | sort)
           gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
             --title "Voxelheim $TAG" \
+            --notes "Downloads below. Run the installer (Windows), open the DMG (macOS), or install the rpm/deb / run the AppImage (Linux). The portable web bundle runs with \`npm install && npm start\`." \
             --generate-notes \
-            "dist/voxelheim-${VER}.zip#Voxelheim $TAG (game bundle)" \
-            "tex-preview/atlas_big.png#texture-atlas.png" \
-            "tex-preview/mobs.png#creatures-and-hud.png"
+            $FILES
 
       - name: Job summary
         if: always()
@@ -88,20 +221,11 @@ jobs:
           {
             echo "## Voxelheim ${{ env.TAG || github.ref_name }}"
             echo ""
-            if [ -f test.log ]; then
-              echo "### Test results"
-              echo '```'
-              grep -E "^(PASS|FAIL|[0-9]+/[0-9]+)" test.log || true
-              echo '```'
-            fi
-            if [ -d tex-preview ]; then
-              echo "### Texture previews"
-              echo "| atlas | creatures & HUD |"
-              echo "|---|---|"
-              echo "| ![atlas](tex-preview/atlas_big.png) | ![mobs](tex-preview/mobs.png) |"
-            fi
-            if [ -n "${{ env.TAG }}" ] && gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-              echo ""
+            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
               echo "Released: https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
+              echo ""
+              echo "| asset | size |"
+              echo "|---|---|"
+              gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[] | "| \(.name) | \(.size) bytes |"'
             fi
           } >> "$GITHUB_STEP_SUMMARY"

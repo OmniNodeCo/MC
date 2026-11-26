@@ -1,16 +1,98 @@
 {
   "name": "voxelheim",
-  "version": "1.0.0",
+  "productName": "Voxelheim",
+  "version": "1.1.0",
   "type": "module",
-  "description": "Voxelheim — a hand-built voxel sandbox game: custom engine, original creatures, hand-coded pixel textures.",
+  "description": "Voxelheim — a hand-built voxel sandbox game: original engine, creatures, and code-painted textures. Runs in the browser or as a native desktop app.",
+  "main": "desktop/main.mjs",
+  "author": {
+    "name": "OmniNodeCo"
+  },
+  "license": "MIT",
   "scripts": {
     "start": "node server.js",
-    "test": "node tools/selftest.mjs && node tools/sim.mjs"
+    "test": "node tools/selftest.mjs && node tools/sim.mjs",
+    "icons": "node tools/icon.mjs",
+    "dist:web": "node tools/package.mjs",
+    "dist": "electron-builder"
   },
   "dependencies": {
     "three": "^0.171.0"
   },
   "devDependencies": {
-    "@napi-rs/canvas": "^1.2.1"
+    "@napi-rs/canvas": "^1.2.1",
+    "electron": "33.2.0",
+    "electron-builder": "25.1.8",
+    "png2icons": "2.0.1"
+  },
+  "build": {
+    "appId": "com.omninodeco.voxelheim",
+    "productName": "Voxelheim",
+    "asar": true,
+    "directories": {
+      "output": "dist-desktop",
+      "buildResources": "build-res"
+    },
+    "files": [
+      "desktop/main.mjs",
+      "public/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.games",
+      "icon": "build-res/icon.icns",
+      "artifactName": "Voxelheim-${version}-macOS-${arch}.${ext}",
+      "targets": ["dmg", "zip"],
+      "dmg": {
+        "title": "Voxelheim ${version}",
+        "contents": [
+          { "x": 130, "y": 220 },
+          { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+        ],
+        "window": { "width": 540, "height": 380 }
+      },
+      "zip": {
+        "artifactName": "Voxelheim-${version}-macOS-${arch}-portable.zip"
+      }
+    },
+    "win": {
+      "icon": "build-res/icon.ico",
+      "artifactName": "Voxelheim-${version}-Windows-${arch}.${ext}",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Voxelheim",
+      "artifactName": "Voxelheim-${version}-Windows-Setup-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Voxelheim-${version}-Windows-Portable-${arch}.exe"
+    },
+    "linux": {
+      "icon": "build-res/icon.png",
+      "category": "Game",
+      "artifactName": "Voxelheim-${version}-Linux-${arch}.${ext}",
+      "target": ["rpm", "AppImage", "deb"],
+      "desktop": {
+        "Name": "Voxelheim",
+        "Comment": "A hand-built voxel sandbox game",
+        "Categories": "Game;AdventureBlock;"
+      }
+    },
+    "rpm": {
+      "artifactName": "Voxelheim-${version}-Linux-${arch}.rpm"
+    },
+    "deb": {
+      "artifactName": "Voxelheim-${version}-Linux-${arch}.deb"
+    },
+    "appImage": {
+      "artifactName": "Voxelheim-${version}-Linux-${arch}.AppImage"
+    }
   }
 }

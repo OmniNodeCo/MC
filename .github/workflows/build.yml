@@ -4,6 +4,7 @@ on:
   push:
     branches: ['**']
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
-    name: Test & package
+  test:
+    name: Test & package (web)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,13 +38,13 @@ jobs:
         env:
           VOXELHEIM_TEX_OUT: tex-preview
 
-      - name: Package game
+      - name: Package web bundle
         run: node tools/package.mjs
 
-      - name: Upload game build
+      - name: Upload web bundle
         uses: actions/upload-artifact@v4
         with:
-          name: voxelheim-${{ github.sha }}
+          name: voxelheim-web-${{ github.sha }}
           path: dist/*.zip
           if-no-files-found: error
 
@@ -73,4 +74,75 @@ jobs:
               echo "|---|---|"
               echo "| ![atlas](tex-preview/atlas_big.png) | ![mobs](tex-preview/mobs.png) |"
             fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  desktop:
+    name: Desktop ${{ matrix.os }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: --win --x64
+          - os: macos-latest
+            args: --mac --x64 --arm64
+          - os: ubuntu-latest
+            args: --linux --x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build desktop app
+        run: npx electron-builder ${{ matrix.args }} --publish never
+
+      - name: Stage artifacts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path stage | Out-Null
+          Copy-Item dist-desktop/*.exe stage/ -ErrorAction SilentlyContinue
+          Copy-Item dist-desktop/*.blockmap stage/ -ErrorAction SilentlyContinue
+          Copy-Item dist-desktop/latest*.yml stage/ -ErrorAction SilentlyContinue
+          Get-ChildItem stage | ForEach-Object { $_.Name }
+
+      - name: Stage artifacts (macOS / Linux)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p stage
+          cp dist-desktop/*.dmg stage/ 2>/dev/null || true
+          cp dist-desktop/*.zip stage/ 2>/dev/null || true
+          cp dist-desktop/*.rpm stage/ 2>/dev/null || true
+          cp dist-desktop/*.AppImage stage/ 2>/dev/null || true
+          cp dist-desktop/*.deb stage/ 2>/dev/null || true
+          cp dist-desktop/latest*.yml stage/ 2>/dev/null || true
+          ls -la stage/
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.os }}-${{ github.sha }}
+          path: stage/*
+          if-no-files-found: error
+
+      - name: Job summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## Desktop build — ${{ matrix.os }}"
+            echo ""
+            echo '```'
+            (ls -la stage/ 2>/dev/null || ls -la dist-desktop/ 2>/dev/null || true)
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
