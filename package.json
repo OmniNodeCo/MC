@@ -51,9 +51,6 @@
       ],
       "window": { "width": 540, "height": 380 }
     },
-    "zip": {
-      "artifactName": "Voxelheim-${version}-macOS-${arch}-portable.zip"
-    },
     "win": {
       "icon": "build-res/icon.ico",
       "artifactName": "Voxelheim-${version}-Windows-${arch}.${ext}",
