@@ -461,38 +461,43 @@ export class Entities {
   }
 
   trySpawn(player, sky) {
-    const p = player.pos;
-    const ang = Math.random() * Math.PI * 2;
-    const d = 24 + Math.random() * 20;
-    const x = Math.floor(p.x + Math.cos(ang) * d);
-    const z = Math.floor(p.z + Math.sin(ang) * d);
-    const info = this.world.columnInfo(x, z);
-    if (info.biome === 'ocean') return;
-    const sy = this.world.surfaceY(x, z);
-    if (sy <= SEA) return;
-    if (this.world.getBlock(x, sy + 1, z) === B.WATER) return;
-
     const night = sky.nightFactor > 0.55;
-    if (night && this.count('gloomling') < 7 && Math.random() < 0.8 && info.biome !== 'desert') {
-      this.spawn('gloomling', x + 0.5, sy + 1, z + 0.5);
-      if (!this.gloomSeen) {
-        this.gloomSeen = true;
-        if (this.onFirstGloom) this.onFirstGloom();
+    const p = player.pos;
+    // up to 4 candidate points per tick so nights stay lively even next to
+    // oceans/deserts where many nearby columns are unspawnable
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const ang = Math.random() * Math.PI * 2;
+      const d = 24 + Math.random() * 20;
+      const x = Math.floor(p.x + Math.cos(ang) * d);
+      const z = Math.floor(p.z + Math.sin(ang) * d);
+      const info = this.world.columnInfo(x, z);
+      if (info.biome === 'ocean') continue;
+      const sy = this.world.surfaceY(x, z);
+      if (sy <= SEA) continue;
+      if (this.world.getBlock(x, sy + 1, z) === B.WATER) continue;
+
+      if (night) {
+        if (info.biome === 'desert') continue;
+        if (this.count('gloomling') >= 7) return;
+        if (Math.random() < 0.8) {
+          this.spawn('gloomling', x + 0.5, sy + 1, z + 0.5);
+          if (!this.gloomSeen) {
+            this.gloomSeen = true;
+            if (this.onFirstGloom) this.onFirstGloom();
+          }
+        }
+        return;
+      }
+      if (sky.dayFactor > 0.55 && Math.random() < 0.55) {
+        if (info.biome === 'mountain' && this.count('wisp') < 3 && Math.random() < 0.7) {
+          this.spawn('wisp', x + 0.5, sy + 6 + Math.random() * 6, z + 0.5);
+        } else if ((info.biome === 'forest' || info.biome === 'plains') && this.count('hopper') < 5 && Math.random() < 0.55) {
+          this.spawn('hopper', x + 0.5, sy + 1, z + 0.5);
+        } else if ((info.biome === 'forest' || info.biome === 'plains' || info.biome === 'mountain') && this.count('puffbird') < 4) {
+          this.spawn('puffbird', x + 0.5, sy + 6 + Math.random() * 6, z + 0.5);
+        }
       }
       return;
-    }
-    if (info.biome === 'desert' && this.count('skitter') < 4 && Math.random() < 0.6) {
-      this.spawn('skitter', x + 0.5, sy + 1, z + 0.5);
-      return;
-    }
-    if (sky.dayFactor > 0.55 && Math.random() < 0.55) {
-      if (info.biome === 'mountain' && this.count('wisp') < 3 && Math.random() < 0.7) {
-        this.spawn('wisp', x + 0.5, sy + 6 + Math.random() * 6, z + 0.5);
-      } else if ((info.biome === 'forest' || info.biome === 'plains') && this.count('hopper') < 5 && Math.random() < 0.55) {
-        this.spawn('hopper', x + 0.5, sy + 1, z + 0.5);
-      } else if ((info.biome === 'forest' || info.biome === 'plains' || info.biome === 'mountain') && this.count('puffbird') < 4) {
-        this.spawn('puffbird', x + 0.5, sy + 6 + Math.random() * 6, z + 0.5);
-      }
     }
   }
 

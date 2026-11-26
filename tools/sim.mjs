@@ -145,11 +145,34 @@ if (hit) {
 }
 
 // ---------------------------------------------------------------- night: gloomlings
+// release movement keys, then relocate to open non-desert land so night spawn
+// attempts have valid ground (a coastal/desert end-point could starve the spawner)
+player.onKey('KeyW', false, 0);
+player.keys.clear();
+{
+  const px0 = Math.floor(player.pos.x), pz0 = Math.floor(player.pos.z);
+  let spot = null;
+  for (let r = 0; r <= 200 && !spot; r += 4) {
+    for (let a = 0; a < 16 && !spot; a++) {
+      const x = px0 + Math.round(Math.cos((a / 16) * Math.PI * 2) * r);
+      const z = pz0 + Math.round(Math.sin((a / 16) * Math.PI * 2) * r);
+      const info = world.columnInfo(x, z);
+      if ((info.biome !== 'ocean' && info.biome !== 'desert' && info.h > SEA)) spot = { x, z };
+    }
+  }
+  if (spot) {
+    player.pos.set(spot.x + 0.5, world.surfaceY(spot.x, spot.z) + 1.01, spot.z + 0.5);
+    player.vel.set(0, 0, 0);
+    player.hp = 20;
+    player.dead = false;
+  }
+}
+
 sky.time = 0.62; // deep night
 sky.update(0.01, player.pos, false, 84);
 check('night detected', sky.nightFactor > 0.8, `night=${sky.nightFactor.toFixed(2)}`);
 let spawnedNaturally = false;
-for (let f = 0; f < 60 * 25 && !spawnedNaturally; f++) {
+for (let f = 0; f < 60 * 40 && !spawnedNaturally; f++) {
   player.update(DT);
   sky.update(DT, player.pos, false, 84);
   entities.update(DT, player, sky);
@@ -159,11 +182,30 @@ check('gloomlings spawn at night', spawnedNaturally,
   entities.list.map(m => m.kind).join(', ') || 'none');
 
 // forced close encounter: revive the player (night wildlife may have killed the AFK player),
-// then drop a gloomling 5 blocks away
+// then spawn a gloomling on verified-open ground right beside them so it is in
+// attack range immediately — no pathing luck involved
 player.dead = false;
 player.hp = 20;
 player.invuln = 0;
-const g = entities.spawn('gloomling', player.pos.x + 5, player.pos.y + 2, player.pos.z);
+const clearGlooms = (except) => {
+  for (const m of [...entities.list]) {
+    if (m.kind === 'gloomling' && m !== except) {
+      entities.remove(m);
+      entities.list.splice(entities.list.indexOf(m), 1);
+    }
+  }
+};
+let g = null;
+for (const [ox, oz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) {
+  const fx = Math.floor(player.pos.x + ox), fz = Math.floor(player.pos.z + oz);
+  const fy = Math.floor(player.pos.y);
+  if (world.getBlock(fx, fy, fz) === B.AIR && world.getBlock(fx, fy + 1, fz) === B.AIR) {
+    g = entities.spawn('gloomling', player.pos.x + ox, player.pos.y + 0.2, player.pos.z + oz);
+    break;
+  }
+}
+if (!g) g = entities.spawn('gloomling', player.pos.x + 1, player.pos.y + 0.2, player.pos.z);
+clearGlooms(g);
 let sawChase = false, gotHit = false;
 const hpBefore = player.hp;
 for (let f = 0; f < 60 * 14; f++) {
@@ -200,21 +242,28 @@ const target = entities.spawn('hopper', player.pos.x + 3, player.pos.y + 0.5, pl
 // ---------------------------------------------------------------- daylight burn
 sky.time = 0.25; // noon
 sky.update(0.01, player.pos, false, 84);
+clearGlooms(null);
 const g2 = entities.spawn('gloomling', player.pos.x + 2, player.pos.y + 1, player.pos.z);
-// make sure it's sky-exposed: clear a column above it if needed
-const gx = Math.floor(g2.pos.x), gz = Math.floor(g2.pos.z);
-for (let y = Math.floor(g2.pos.y) + 2; y < CH; y++) {
-  if (BLOCKS[world.getBlock(gx, y, gz)].opaque) world.setBlock(gx, y, gz, B.AIR);
-}
 let burned = false;
 for (let f = 0; f < 60 * 6; f++) {
+  g2.moving = false; // keep it put
+  // keep the sky above its current column clear so exposure is deterministic
+  const bx = Math.floor(g2.pos.x), bz = Math.floor(g2.pos.z);
+  for (let y = Math.floor(g2.pos.y) + 2; y < CH; y++) {
+    if (BLOCKS[world.getBlock(bx, y, bz)].opaque) world.setBlock(bx, y, bz, B.AIR);
+  }
+  player.update(DT);
   entities.update(DT, player, sky);
   if (g2.dying > 0 || !entities.list.includes(g2)) { burned = true; break; }
 }
 check('gloomling burns in sunlight', burned);
 
 // ---------------------------------------------------------------- death & respawn
-player.damage(100, null);
+// retry across the 0.5s invulnerability window a real hit leaves behind
+for (let i = 0; i < 90 && !player.dead; i++) {
+  player.update(DT);
+  player.damage(100, null);
+}
 check('player death fires', player.dead);
 player.respawn();
 check('respawn restores hp/position', !player.dead && player.hp === 20 &&
