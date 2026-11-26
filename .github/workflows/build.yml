@@ -113,6 +113,17 @@ jobs:
         shell: bash
         run: set -o pipefail && npx electron-builder ${{ matrix.args }} --publish never 2>&1 | tee desktop-build.log
 
+      - name: Push build log to scratch ref (temporary debug)
+        if: failure()
+        shell: bash
+        run: |
+          perl -pe 's/\e\[[0-9;]*m//g' desktop-build.log > "eb-log-${{ matrix.os }}.txt" 2>/dev/null || cp desktop-build.log "eb-log-${{ matrix.os }}.txt"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f "eb-log-${{ matrix.os }}.txt"
+          git commit -q -m "ci debug log [skip ci]"
+          git push origin "HEAD:refs/tmp/desktop-logs-${{ matrix.os }}" --force || echo "log push failed"
+
       - name: Stage artifacts (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
