@@ -41,18 +41,18 @@
       "category": "public.app-category.games",
       "icon": "build-res/icon.icns",
       "artifactName": "Voxelheim-${version}-macOS-${arch}.${ext}",
-      "targets": ["dmg", "zip"],
-      "dmg": {
-        "title": "Voxelheim ${version}",
-        "contents": [
-          { "x": 130, "y": 220 },
-          { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
-        ],
-        "window": { "width": 540, "height": 380 }
-      },
-      "zip": {
-        "artifactName": "Voxelheim-${version}-macOS-${arch}-portable.zip"
-      }
+      "target": ["dmg", "zip"]
+    },
+    "dmg": {
+      "title": "Voxelheim ${version}",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ],
+      "window": { "width": 540, "height": 380 }
+    },
+    "zip": {
+      "artifactName": "Voxelheim-${version}-macOS-${arch}-portable.zip"
     },
     "win": {
       "icon": "build-res/icon.ico",
