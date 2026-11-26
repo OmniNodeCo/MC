@@ -144,7 +144,6 @@ jobs:
           New-Item -ItemType Directory -Force -Path stage | Out-Null
           Copy-Item dist-desktop/*.exe stage/ -ErrorAction SilentlyContinue
           Copy-Item dist-desktop/*.blockmap stage/ -ErrorAction SilentlyContinue
-          Copy-Item dist-desktop/latest*.yml stage/ -ErrorAction SilentlyContinue
           Get-ChildItem stage | ForEach-Object { $_.Name }
 
       - name: Stage artifacts (macOS / Linux)
@@ -156,7 +155,6 @@ jobs:
           cp dist-desktop/*.rpm stage/ 2>/dev/null || true
           cp dist-desktop/*.AppImage stage/ 2>/dev/null || true
           cp dist-desktop/*.deb stage/ 2>/dev/null || true
-          cp dist-desktop/latest*.yml stage/ 2>/dev/null || true
           ls -la stage/
 
       - name: Upload desktop artifacts
