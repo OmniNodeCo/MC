@@ -113,8 +113,14 @@ jobs:
         shell: bash
         run: |
           if [ -f desktop-build.log ]; then
-            PAYLOAD=$(tail -40 desktop-build.log | sed ':a;N;$!ba;s/\n/%0A/g' | tail -c 3800)
-            echo "::error title=electron-builder log (${{ matrix.os }})::${PAYLOAD:-<empty log>}"
+            {
+              echo "--- matched error lines ---"
+              grep -aE "⨯|invalid|Error|Property|Option|expected|Unexpected|should|schema|configuration" desktop-build.log | head -25
+              echo "--- first 15 lines ---"
+              head -15 desktop-build.log
+            } > debug-extract.txt
+            PAYLOAD=$(sed ':a;N;$!ba;s/\n/%0A/g' debug-extract.txt | tail -c 3800)
+            echo "::error title=electron-builder log (${{ matrix.os }})::${PAYLOAD:-<empty>}"
           fi
 
       - name: Stage artifacts (Windows)
