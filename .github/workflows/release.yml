@@ -226,11 +226,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           FILES=$(find assets -type f | sort)
+          cat > release-notes.md <<EOF
+          **Voxelheim $TAG** — a hand-built voxel sandbox: original engine, original creatures, code-painted textures.
+
+          | Platform | How to run |
+          |---|---|
+          | Windows | Run \`Voxelheim-$VER-Windows-Setup-x64.exe\` (installer) or the \`-Portable-\` exe |
+          | macOS | Open the DMG and drag to Applications — \`arm64\` for Apple Silicon, \`x64\` for Intel |
+          | Linux | Install the \`.rpm\` / \`.deb\`, or run the \`.AppImage\` directly (\`chmod +x\` first) |
+          | Web | Unzip \`voxelheim-$VER.zip\`, then \`npm install && npm start\` → http://localhost:3000 |
+
+          Built from commit $GITHUB_SHA. See the commit history for changes.
+          EOF
           gh release create "$TAG" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Voxelheim $TAG" \
-            --notes "Downloads below. Run the installer (Windows), open the DMG (macOS), or install the rpm/deb / run the AppImage (Linux). The portable web bundle runs with \`npm install && npm start\`." \
-            --generate-notes \
+            --notes-file release-notes.md \
             $FILES
 
       - name: Job summary
