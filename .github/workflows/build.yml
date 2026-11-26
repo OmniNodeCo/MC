@@ -79,6 +79,8 @@ jobs:
   desktop:
     name: Desktop ${{ matrix.os }}
     needs: test
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -113,14 +115,12 @@ jobs:
         shell: bash
         run: |
           if [ -f desktop-build.log ]; then
-            {
-              echo "--- matched error lines ---"
-              grep -aE "⨯|invalid|Error|Property|Option|expected|Unexpected|should|schema|configuration" desktop-build.log | head -25
-              echo "--- first 15 lines ---"
-              head -15 desktop-build.log
-            } > debug-extract.txt
-            PAYLOAD=$(sed ':a;N;$!ba;s/\n/%0A/g' debug-extract.txt | tail -c 3800)
-            echo "::error title=electron-builder log (${{ matrix.os }})::${PAYLOAD:-<empty>}"
+            perl -pe 's/\e\[[0-9;]*m//g' desktop-build.log > "eb-log-${{ matrix.os }}.txt" 2>/dev/null || cp desktop-build.log "eb-log-${{ matrix.os }}.txt"
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -f "eb-log-${{ matrix.os }}.txt"
+            git commit -q -m "ci debug log [skip ci]"
+            git push origin "HEAD:refs/tmp/desktop-logs" --force || echo "log push failed"
           fi
 
       - name: Stage artifacts (Windows)
