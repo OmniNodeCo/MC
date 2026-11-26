@@ -238,11 +238,19 @@ jobs:
 
           Built from commit $GITHUB_SHA. See the commit history for changes.
           EOF
-          gh release create "$TAG" \
+          if ! gh release create "$TAG" \
             --repo "$GITHUB_REPOSITORY" \
             --title "Voxelheim $TAG" \
             --notes-file release-notes.md \
-            $FILES
+            $FILES 2>gh-create-error.txt; then
+            echo "--- gh release create failed ---"
+            cat gh-create-error.txt
+            echo "--- files ---"
+            echo "$FILES" | head -30
+            PAYLOAD=$(sed ':a;N;$!ba;s/\n/%0A/g' gh-create-error.txt | tail -c 1200)
+            echo "::error title=gh release create::${PAYLOAD:-<no stderr>}"
+            exit 1
+          fi
 
       - name: Job summary
         if: always()
