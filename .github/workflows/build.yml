@@ -104,7 +104,18 @@ jobs:
         run: npm ci
 
       - name: Build desktop app
-        run: npx electron-builder ${{ matrix.args }} --publish never
+        run: set -o pipefail && npx electron-builder ${{ matrix.args }} --publish never 2>&1 | tee desktop-build.log
+        env:
+          DEBUG: electron-builder
+
+      - name: Expose build log via annotation (temporary debug)
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f desktop-build.log ]; then
+            PAYLOAD=$(tail -40 desktop-build.log | sed ':a;N;$!ba;s/\n/%0A/g' | tail -c 3800)
+            echo "::error title=electron-builder log (${{ matrix.os }})::${PAYLOAD:-<empty log>}"
+          fi
 
       - name: Stage artifacts (Windows)
         if: runner.os == 'Windows'
