@@ -193,7 +193,7 @@ jobs:
 
       - name: Verify every platform shipped
         run: |
-          find assets -type f | sort
+          find assets -type f | sort > verify.txt
           miss=0
           for pat in \
             "Voxelheim-$VER-Windows-Setup-x64.exe" \
@@ -208,10 +208,18 @@ jobs:
             "mobs.png"; do
             if [ -z "$(find assets -name "$pat" -print -quit)" ]; then
               echo "::error::missing release asset: $pat"
+              echo "MISS: $pat" >> verify.txt
               miss=1
             fi
           done
-          [ "$miss" = 1 ] && exit 1
+          if [ "$miss" = 1 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -f verify.txt
+            git commit -q -m "release verify debug [skip ci]"
+            git push origin "HEAD:refs/tmp/release-verify" --force || true
+            exit 1
+          fi
           echo "all expected assets present"
 
       - name: Create GitHub release
