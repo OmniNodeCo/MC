@@ -95,17 +95,23 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   desktop:
-    name: Desktop ${{ matrix.os }}
+    name: Desktop ${{ matrix.label }}
     needs: test
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: windows-latest
+            label: win-x64
             args: --win --x64
           - os: macos-latest
-            args: --mac --x64 --arm64
+            label: mac-x64
+            args: --mac --x64
+          - os: macos-latest
+            label: mac-arm64
+            args: --mac --arm64
           - os: ubuntu-22.04
+            label: linux-x64
             args: --linux --x64
     runs-on: ${{ matrix.os }}
     steps:
@@ -154,7 +160,7 @@ jobs:
       - name: Upload desktop artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-${{ matrix.os }}-${{ github.sha }}
+          name: desktop-${{ matrix.label }}-${{ github.sha }}
           path: stage/*
           if-no-files-found: error
 
