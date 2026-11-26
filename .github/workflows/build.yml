@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test & package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test suites (engine + integration sim)
+        run: set -o pipefail && npm test 2>&1 | tee test.log
+
+      - name: Render texture previews
+        run: node tools/selftest.mjs
+        env:
+          VOXELHEIM_TEX_OUT: tex-preview
+
+      - name: Package game
+        run: node tools/package.mjs
+
+      - name: Upload game build
+        uses: actions/upload-artifact@v4
+        with:
+          name: voxelheim-${{ github.sha }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+      - name: Upload texture previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: texture-previews-${{ github.sha }}
+          path: tex-preview/*.png
+          if-no-files-found: error
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Voxelheim build — \`${{ github.sha }}\`"
+            echo ""
+            if [ -f test.log ]; then
+              echo "### Test results"
+              echo '```'
+              grep -E "^(PASS|FAIL|[0-9]+/[0-9]+)" test.log || true
+              echo '```'
+              echo ""
+            fi
+            if [ -d tex-preview ]; then
+              echo "### Texture previews"
+              echo "| atlas | creatures & HUD |"
+              echo "|---|---|"
+              echo "| ![atlas](tex-preview/atlas_big.png) | ![mobs](tex-preview/mobs.png) |"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

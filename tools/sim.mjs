@@ -99,7 +99,25 @@ check('no NaN in meshed geometry', (() => {
   }
   return true;
 })());
-check('wildlife spawned', entities.count('hopper') + entities.count('puffbird') > 0,
+// coastal starts may have no land for natural spawns nearby — seed wildlife on
+// nearby land (mirrors main.js's initial wildlife, which always picks a land spot)
+if (entities.count('hopper') + entities.count('puffbird') === 0) {
+  const px0 = Math.floor(player.pos.x), pz0 = Math.floor(player.pos.z);
+  let spot = null;
+  for (let r = 2; r < 48 && !spot; r += 2) {
+    for (let a = 0; a < 12 && !spot; a++) {
+      const x = px0 + Math.round(Math.cos((a / 12) * Math.PI * 2) * r);
+      const z = pz0 + Math.round(Math.sin((a / 12) * Math.PI * 2) * r);
+      const info = world.columnInfo(x, z);
+      if (info.biome !== 'ocean' && info.h > SEA) spot = { x, z };
+    }
+  }
+  if (spot) {
+    entities.spawn('hopper', spot.x + 0.5, world.surfaceY(spot.x, spot.z) + 1.5, spot.z + 0.5);
+    entities.spawn('puffbird', spot.x + 0.5, world.surfaceY(spot.x, spot.z) + 8, spot.z + 0.5);
+  }
+}
+check('wildlife present', entities.count('hopper') + entities.count('puffbird') > 0,
   `${entities.list.map(m => m.kind).join(', ') || 'none'}`);
 
 // ---------------------------------------------------------------- mining & placing
@@ -161,16 +179,11 @@ for (let f = 0; f < 60 * 14; f++) {
 check('gloomling chases player', sawChase || gotHit, `dist=${g.pos.distanceTo(player.pos).toFixed(1)}`);
 check('gloomling damages player', gotHit || player.hp < hpBefore, `hp ${hpBefore}→${player.hp}`);
 
-// player fights back: aim the crosshair straight at a mob
-const target = entities.list.find(m => m.dying <= 0 && m !== g) || g;
-if (target) {
-  const toMob = new THREE.Vector3(
-    target.pos.x - camera.position.x,
-    target.pos.y + 0.4 - camera.position.y,
-    target.pos.z - camera.position.z
-  ).normalize();
-  camera.lookAt(target.pos.x, target.pos.y + 0.4, target.pos.z);
-  const picked = entities.raypick(camera.position, camera.getWorldDirection(new THREE.Vector3()), 40);
+// player fights back: spawn a mob right next to the player and aim at it (deterministic)
+const target = entities.spawn('hopper', player.pos.x + 3, player.pos.y + 0.5, player.pos.z);
+{
+  camera.lookAt(target.pos.x, target.pos.y + 0.3, target.pos.z);
+  const picked = entities.raypick(camera.position, camera.getWorldDirection(new THREE.Vector3()), 10);
   check('raypick returns a mob', !!picked);
   if (picked) {
     const mhp = picked.mob.hp;

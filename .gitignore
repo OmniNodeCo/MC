@@ -1,1 +1,4 @@
 node_modules/
+dist/
+tex-preview/
+test.log

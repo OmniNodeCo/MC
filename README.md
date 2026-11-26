@@ -81,4 +81,18 @@ npm test             # engine tests + integration sim (all headless)
 ```
 
 The selftest also renders the full texture atlas and the creature/HUD sprite sheet to
-`/tmp/atlas_big.png` and `/tmp/mobs.png` for pixel-level review.
+`/tmp/atlas_big.png` and `/tmp/mobs.png` for pixel-level review (set `VOXELHEIM_TEX_OUT`
+to change the destination).
+
+## CI & releases
+
+- **`.github/workflows/build.yml`** — on every push/PR: runs both test suites, renders
+  texture previews, packages the game, and uploads `voxelheim-<sha>.zip` plus the
+  preview PNGs as artifacts. Results are written to the job summary.
+- **`.github/workflows/release.yml`** — on a `v*` tag push (or manual dispatch with a
+  version input): runs tests, packages `voxelheim-<version>.zip`, and publishes a
+  GitHub release with the bundle and texture previews attached. Run it with:
+  `gh workflow run release.yml -f version=v1.0.1`.
+
+To package locally: `node tools/package.mjs v1.0.0` → `dist/voxelheim-1.0.0.zip`.
+Unzip, `npm install && npm start`, open http://localhost:3000.

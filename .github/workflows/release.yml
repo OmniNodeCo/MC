@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release tag, e.g. v1.0.1'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Test, package & release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test suites (engine + integration sim)
+        run: set -o pipefail && npm test 2>&1 | tee test.log
+
+      - name: Determine tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+          fi
+          case "$TAG" in
+            v*) ;;
+            *) TAG="v$TAG" ;;
+          esac
+          if ! echo "$TAG" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+([-+][0-9A-Za-z.-]+)?$'; then
+            echo "::error::invalid tag: $TAG (expected e.g. v1.0.1)"
+            exit 1
+          fi
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          VER="${TAG#v}"
+          echo "VER=$VER" >> "$GITHUB_ENV"
+
+      - name: Create tag (manual runs)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG" -m "Voxelheim $TAG" "$GITHUB_SHA"
+          git push origin "$TAG"
+
+      - name: Package game
+        run: node tools/package.mjs "$VER"
+
+      - name: Render texture previews
+        run: node tools/selftest.mjs
+        env:
+          VOXELHEIM_TEX_OUT: tex-preview
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" \
+            --title "Voxelheim $TAG" \
+            --generate-notes \
+            "dist/voxelheim-${VER}.zip#Voxelheim $TAG (game bundle)" \
+            "tex-preview/atlas_big.png#texture-atlas.png" \
+            "tex-preview/mobs.png#creatures-and-hud.png"
+
+      - name: Job summary
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "## Voxelheim ${{ env.TAG || github.ref_name }}"
+            echo ""
+            if [ -f test.log ]; then
+              echo "### Test results"
+              echo '```'
+              grep -E "^(PASS|FAIL|[0-9]+/[0-9]+)" test.log || true
+              echo '```'
+            fi
+            if [ -d tex-preview ]; then
+              echo "### Texture previews"
+              echo "| atlas | creatures & HUD |"
+              echo "|---|---|"
+              echo "| ![atlas](tex-preview/atlas_big.png) | ![mobs](tex-preview/mobs.png) |"
+            fi
+            if [ -n "${{ env.TAG }}" ] && gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              echo ""
+              echo "Released: https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -2,10 +2,16 @@
 // world generation, meshing, raycasting and physics. Run: npm test
 import zlib from 'node:zlib';
 import fs from 'node:fs';
+import path from 'node:path';
 import { buildAtlas, waterPx, mobPx, heartPx, bubblePx, TILE, COLS, ROWS, TILES } from '../public/js/textures.js';
 import { World, collideMove, CS, CH, SEA } from '../public/js/world.js';
 import { B, BLOCKS } from '../public/js/blocks.js';
 import { Px } from '../public/js/textures.js';
+
+// texture previews go to VOXELHEIM_TEX_OUT (default /tmp)
+const TEX_OUT = process.env.VOXELHEIM_TEX_OUT || '/tmp';
+fs.mkdirSync(TEX_OUT, { recursive: true });
+const save = (name, px) => write(path.join(TEX_OUT, name), px);
 
 // ---------------------------------------------------------------- PNG writer
 let CRC_TABLE = null;
@@ -53,8 +59,8 @@ const write = (p, px) => fs.writeFileSync(p, encodePNG(px));
 
 // ---------------------------------------------------------------- texture sheets
 const { px: atlasPx } = buildAtlas();
-write('/tmp/atlas.png', atlasPx);
-write('/tmp/atlas_big.png', atlasPx.scaled(6));
+save('atlas.png', atlasPx);
+save('atlas_big.png', atlasPx.scaled(6));
 
 // contact sheet: water + mob skins + hud sprites, each scaled x5
 const sheet = new Px(16 * 12, 16 * 2);
@@ -84,7 +90,7 @@ for (const [, px] of items) {
   out.blit(px.scaled(f), ox, 8);
   ox += 16 * f + 8;
 }
-write('/tmp/mobs.png', out);
+save('mobs.png', out);
 console.log('texture items:', items.map(([n]) => n).join(', '));
 
 // ---------------------------------------------------------------- world tests
